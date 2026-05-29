@@ -225,7 +225,7 @@
     <button onclick="login()">Anmelden</button>
 
     <div class="support-footer">
-      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
+      Bei Fragen an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
       <span class="reload-hint">Falls neue Nachrichten nicht geladen werden, bitte die Seite neu laden.</span>
     </div>
   </div>
@@ -243,7 +243,7 @@
     <button onclick="register()">Registrieren</button>
 
     <div class="support-footer">
-      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
+      Bei Fragen an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
     </div>
   </div>
 
@@ -257,7 +257,7 @@
     </div>
 
     <div class="support-footer">
-      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
+      Bei Fragen an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
       <span class="reload-hint">Falls neue Nachrichten nicht geladen werden, bitte die Seite neu laden.</span>
     </div>
   </div>
@@ -285,6 +285,7 @@
     const adminUid = "yY81pFPtCHfEzjUyA0bcVlhO0cv1";
     const allowedDomains = ["gmail.com", "outlook.com", "yahoo.com"];
     
+    // Im Cache werden nun Name UND E-Mail gespeichert
     const userCache = {};
 
     // WECHSEL-FUNKTIONEN
@@ -402,6 +403,7 @@
 
       try {
         const currentUser = auth.currentUser;
+        // Checken, ob die Person, die gerade auf die Seite guckt, der Admin ist
         const isCurrentAdmin = (currentUser && currentUser.uid === adminUid);
 
         const q = query(collection(db, "Nachrichten"), orderBy("timestamp"));
@@ -438,6 +440,7 @@
             const displayUsername = cachedUser ? cachedUser.username : "Anonym";
             const displayEmail = cachedUser ? cachedUser.email : "";
 
+            // HIER PASSIERT DIE PRÜFUNG: Nur der Admin sieht die E-Mail-Adresse im Chat
             if (isCurrentAdmin && displayEmail !== "") {
               textSpan.textContent = `${displayUsername} (${displayEmail}): ${data.text}`;
             } else {
