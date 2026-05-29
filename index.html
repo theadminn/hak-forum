@@ -435,8 +435,6 @@
       
       <div class="sidebar-box" id="secretNetfxBtn" style="display: none; background: #1a1a1a; color: #ff3333; border-color: #ff0000;" onclick="openPopup('netfxPopup')">Net.fx ⚙</div>
 
-      <div class="sidebar-box" id="adminClearBtn" style="display: none; color: white; background: #dc3545; border-color: #bd2130;" onclick="clearChatHistory()">Chatverlauf leeren</div>
-      
       <div class="sidebar-box" onclick="logout()" style="color: red; border-color: #ffa0a0; margin-top: auto;">Abmelden</div>
       
       <div class="scroll-buttons-container">
@@ -534,7 +532,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getAuth, setPersistence, browserSessionPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, addDoc, collection, getDocs, query, orderBy, onSnapshot, writeBatch, deleteDoc, where } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, addDoc, collection, getDocs, query, orderBy, onSnapshot, deleteDoc, where } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBiZgq5xE6CrOAKAYW0Jqj15UmL-r-RUgQ",
@@ -552,9 +550,13 @@
 
     const adminUid = "yY81pFPtCHfEzjUyA0bcVlhO0cv1";
     const allowedDomains = ["gmail.com", "outlook.com", "yahoo.com"];
+    
     const userCache = {};
+    const adminMailCache = {}; // Cache um festzuhalten, wer Mails mit dem Admin hat
+
     let unsubscribeMessages = null;
     let unsubscribeMailbox = null;
+    let unsubscribeAdminMails = null;
 
     window.openPopup = function(id) {
       document.getElementById(id).style.display = "flex";
@@ -663,10 +665,9 @@
       catch(err) { console.error("Fehler beim Löschen der Mail:", err); }
     }
 
-    // CHECK-LOGIK NUR FÜR MAILS ZWISCHEN USER UND DIR (ADMIN)
     async function checkSecretRankRequirements() {
       const u = auth.currentUser;
-      if(!u || u.uid === adminUid) return false;
+      if(!u || u.uid === adminUid) return;
 
       const userDoc = await getDoc(doc(db, "users", u.uid));
       if(userDoc.exists()) {
@@ -674,22 +675,14 @@
         const count = d.msgCount || 0;
 
         if(count >= 10000) {
-          // Bedingung neu: Hat der User eine Mail von DIR erhalten?
-          const qReceivedFromAdmin = query(collection(db, "PrivatNachrichten"), where("empfaengerId", "==", u.uid), where("senderId", "==", adminUid));
-          // Oder hat der User eine Mail an DICH gesendet?
-          const qSentToAdmin = query(collection(db, "PrivatNachrichten"), where("empfaengerId", "==", adminUid), where("senderId", "==", u.uid));
-          
-          const snapReceived = await getDocs(qReceivedFromAdmin);
-          const snapSent = await getDocs(qSentToAdmin);
-
-          if(!snapReceived.empty || !snapSent.empty) {
+          const hasMails = adminMailCache[u.uid] || false;
+          if(hasMails) {
             document.getElementById("secretNetfxBtn").style.display = "block";
-            return true;
+            return;
           }
         }
       }
       document.getElementById("secretNetfxBtn").style.display = "none";
-      return false;
     }
 
     function getRankInfo(msgCount, uid, hasMailsWithAdmin) {
@@ -712,12 +705,7 @@
         const d = uDoc.data();
         const count = d.msgCount || 0;
         
-        const qRec = query(collection(db, "PrivatNachrichten"), where("empfaengerId", "==", u.uid), where("senderId", "==", adminUid));
-        const qSnt = query(collection(db, "PrivatNachrichten"), where("empfaengerId", "==", adminUid), where("senderId", "==", u.uid));
-        const snapRec = await getDocs(qRec);
-        const snapSnt = await getDocs(qSnt);
-        const hasMailsWithAdmin = (!snapRec.empty || !snapSnt.empty);
-
+        const hasMailsWithAdmin = adminMailCache[u.uid] || false;
         const r = getRankInfo(count, u.uid, hasMailsWithAdmin);
         
         document.getElementById("profNameInput").value = d.username || "Anonym";
@@ -812,21 +800,9 @@
     window.logout = async function() {
       if(unsubscribeMessages) unsubscribeMessages();
       if(unsubscribeMailbox) unsubscribeMailbox();
+      if(unsubscribeAdminMails) unsubscribeAdminMails();
       await signOut(auth);
       location.reload();
-    }
-
-    window.clearChatHistory = async function() {
-      if (auth.currentUser && auth.currentUser.uid === adminUid) {
-        if(confirm("Möchtest du wirklich alle Nachrichten im Chat unwiderruflich löschen?")) {
-          try {
-            const qSnap = await getDocs(collection(db, "Nachrichten"));
-            const batch = writeBatch(db);
-            qSnap.forEach((doc) => { batch.delete(doc.ref); });
-            await batch.commit();
-          } catch(err) { console.error("Fehler beim Löschen:", err); }
-        }
-      }
     }
 
     function showForum() {
@@ -834,9 +810,39 @@
       document.getElementById("registerBox").style.display = "none";
       document.getElementById("toggleBox").style.display = "none";
       document.getElementById("forumBox").style.display = "block";
-      if(auth.currentUser.uid === adminUid) { document.getElementById("adminClearBtn").style.display = "block"; }
       
-      checkSecretRankRequirements();
+      startGlobalListeners();
+    }
+
+    // DIE LÖSUNG: Eigene, ressourcenschonende Echtzeit-Listener abseits des Chatverlaufs
+    function startGlobalListeners() {
+      // 1. User-Datenbank live cachen (für Ränge & Namen)
+      onSnapshot(collection(db, "users"), (snapshot) => {
+        snapshot.forEach((userDoc) => {
+          const userData = userDoc.data();
+          userCache[userDoc.id] = { 
+            username: userData.username || "Anonym", 
+            msgCount: userData.msgCount || 0, 
+            hobbies: userData.hobbies || []
+          };
+        });
+        checkSecretRankRequirements();
+      });
+
+      // 2. PrivatNachrichten live überwachen, um Admin-Mails im Hintergrund zu verknüpfen
+      unsubscribeAdminMails = onSnapshot(collection(db, "PrivatNachrichten"), (snapshot) => {
+        // Cache zurücksetzen
+        for (const key in adminMailCache) { adminMailCache[key] = false; }
+        
+        snapshot.forEach((pmDoc) => {
+          const pm = pmDoc.data();
+          if (pm.senderId === adminUid) { adminMailCache[pm.empfaengerId] = true; }
+          if (pm.empfaengerId === adminUid) { adminMailCache[pm.senderId] = true; }
+        });
+        checkSecretRankRequirements();
+      });
+
+      // 3. Erst wenn Caches bereit sind, laden wir den Chatverlauf flüssig
       listenToMessagesLive();
     }
 
@@ -844,33 +850,8 @@
       const messagesContainer = document.getElementById("messages");
       const q = query(collection(db, "Nachrichten"), orderBy("timestamp"));
 
-      unsubscribeMessages = onSnapshot(q, async (snapshot) => {
+      unsubscribeMessages = onSnapshot(q, (snapshot) => {
         messagesContainer.innerHTML = "";
-        
-        const usersSnapshot = await getDocs(collection(db, "users"));
-        const pmSnapshot = await getDocs(collection(db, "PrivatNachrichten"));
-        
-        usersSnapshot.forEach((userDoc) => {
-          const userData = userDoc.data();
-          let hasMailsWithAdmin = false;
-          
-          pmSnapshot.forEach((pmDoc) => {
-            const pm = pmDoc.data();
-            // FILTER: Prüft exakt, ob eine Nachricht zwischen diesem User und dem Admin existiert
-            if((pm.empfaengerId === userDoc.id && pm.senderId === adminUid) || 
-               (pm.empfaengerId === adminUid && pm.senderId === userDoc.id)) {
-              hasMailsWithAdmin = true;
-            }
-          });
-
-          userCache[userDoc.id] = { 
-            username: userData.username || "Anonym", 
-            email: userData.email || "", 
-            msgCount: userData.msgCount || 0, 
-            hobbies: userData.hobbies || [] ,
-            hasMailsWithAdmin: hasMailsWithAdmin
-          };
-        });
 
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
@@ -885,7 +866,9 @@
           const displayUsername = cachedUser ? cachedUser.username : "Anonym";
           const count = cachedUser ? cachedUser.msgCount : 0;
           const userHobbies = cachedUser ? cachedUser.hobbies : [];
-          const userHasAdminMails = cachedUser ? cachedUser.hasMailsWithAdmin : false;
+          
+          // Holt den Status blitzschnell aus dem Hintergrund-Cache ohne DB-Anfrage
+          const userHasAdminMails = adminMailCache[data.senderId] || false;
 
           const rank = getRankInfo(count, data.senderId, userHasAdminMails);
           messageDiv.style.background = rank.color;
