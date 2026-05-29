@@ -18,13 +18,36 @@
       background:#f2f2f2;
       min-height:100vh;
       display:flex;
+      flex-direction:column;
       justify-content:center;
       align-items:center;
       padding:20px;
+      position:relative;
+    }
+
+    /* Box oben rechts für den Wechsel zwischen Login und Register */
+    .toggle-box {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .toggle-box span {
+      color: #007bff;
+      cursor: pointer;
+      font-weight: bold;
+      text-decoration: underline;
     }
 
     .login-box,
-    .forum-box{
+    .register-box,
+    .forum-box {
       width:100%;
       max-width:700px;
       background:white;
@@ -33,7 +56,8 @@
       box-shadow:0 4px 15px rgba(0,0,0,0.1);
     }
 
-    .forum-box{
+    .register-box,
+    .forum-box {
       display:none;
     }
 
@@ -93,6 +117,7 @@
     }
 
     button{
+      width: 100%;
       padding:12px 18px;
       border:none;
       border-radius:10px;
@@ -111,6 +136,17 @@
       color:red;
       margin-bottom:10px;
       text-align:center;
+    }
+
+    /* Hinweis unter dem Username Feld */
+    .name-hint {
+      display: block;
+      color: #777;
+      font-size: 0.8rem;
+      margin-top: -8px;
+      margin-bottom: 12px;
+      font-style: italic;
+      padding-left: 5px;
     }
 
     /* Handygerechter Support-Text am Fuß der Boxen */
@@ -142,7 +178,21 @@
       font-style:italic;
     }
 
+    .forum-logo {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 150px;
+      height: auto;
+    }
+
     @media(max-width:600px){
+      .toggle-box {
+        position: static;
+        margin-bottom: 15px;
+        width: 100%;
+        text-align: center;
+      }
+
       h1{
         font-size:1.5rem;
       }
@@ -154,30 +204,46 @@
       .input-area{
         flex-direction:column;
       }
-
-      button{
-        width:100%;
-      }
     }
   </style>
 </head>
 
 <body>
 
+  <div class="toggle-box" id="toggleBox">
+    <div id="toRegisterText">Noch kein Konto? <span onclick="showRegister()">Registrieren</span></div>
+    <div id="toLoginText" style="display:none;">Bereits registriert? <span onclick="showLogin()">Anmelden</span></div>
+  </div>
+
   <div class="login-box" id="loginBox">
     <h1>HAK-Sacre-coeur</h1>
-    <div class="error" id="error"></div>
+    <div class="error" id="loginError"></div>
 
-    <input type="email" id="email" placeholder="E-Mail">
-    <input type="password" id="password" placeholder="Passwort">
+    <input type="email" id="loginEmail" placeholder="E-Mail">
+    <input type="password" id="loginPassword" placeholder="Passwort">
 
-    <button onclick="login()">
-      Anmelden / Registrieren
-    </button>
+    <button onclick="login()">Anmelden</button>
 
     <div class="support-footer">
-      Bei Fragen an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
+      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
       <span class="reload-hint">Falls neue Nachrichten nicht geladen werden, bitte die Seite neu laden.</span>
+    </div>
+  </div>
+
+  <div class="register-box" id="registerBox">
+    <h1>Konto erstellen</h1>
+    <div class="error" id="registerError"></div>
+
+    <input type="text" id="regUsername" placeholder="Wunsch-Username">
+    <span class="name-hint">Es wird empfohlen, keine echten Namen zu verwenden.</span>
+
+    <input type="email" id="regEmail" placeholder="E-Mail">
+    <input type="password" id="regPassword" placeholder="Passwort (mind. 6 Zeichen)">
+
+    <button onclick="register()">Registrieren</button>
+
+    <div class="support-footer">
+      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
     </div>
   </div>
 
@@ -187,11 +253,11 @@
 
     <div class="input-area">
       <input type="text" id="messageInput" placeholder="Nachricht schreiben...">
-      <button onclick="sendMessage()">Senden</button>
+      <button onclick="sendMessage()" style="width:auto;">Senden</button>
     </div>
 
     <div class="support-footer">
-      Bei Fragen an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
+      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
       <span class="reload-hint">Falls neue Nachrichten nicht geladen werden, bitte die Seite neu laden.</span>
     </div>
   </div>
@@ -216,23 +282,73 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // DEINE ADMIN ID
     const adminUid = "yY81pFPtCHfEzjUyA0bcVlhO0cv1";
-
-    // ERLAUBTE EMAILS
     const allowedDomains = ["gmail.com", "outlook.com", "yahoo.com"];
+    
+    const userCache = {};
 
-    // LOGIN / REGISTER
+    // WECHSEL-FUNKTIONEN
+    window.showRegister = function() {
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("registerBox").style.display = "block";
+      document.getElementById("toRegisterText").style.display = "none";
+      document.getElementById("toLoginText").style.display = "block";
+    }
+
+    window.showLogin = function() {
+      document.getElementById("loginBox").style.display = "block";
+      document.getElementById("registerBox").style.display = "none";
+      document.getElementById("toRegisterText").style.display = "block";
+      document.getElementById("toLoginText").style.display = "none";
+    }
+
+    // LOGIN
     window.login = async function() {
-      const email = document.getElementById("email").value.trim().toLowerCase();
-      const password = document.getElementById("password").value.trim();
-      const error = document.getElementById("error");
+      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+      const password = document.getElementById("loginPassword").value.trim();
+      const error = document.getElementById("loginError");
+
+      error.textContent = "";
+
+      if (email === "" || password === "") {
+        error.textContent = "Bitte E-Mail und Passwort ausfüllen.";
+        return;
+      }
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        
+        if (userDoc.exists() && userDoc.data().approved === true) {
+          showForum();
+        } else {
+          error.textContent = "Du wurdest noch nicht freigeschaltet.";
+          await auth.signOut();
+        }
+      } catch (loginError) {
+        error.textContent = "Anmeldedaten falsch oder Account existiert nicht.";
+      }
+    };
+
+    // REGISTRIERUNG
+    window.register = async function() {
+      const usernameInput = document.getElementById("regUsername").value.trim();
+      const email = document.getElementById("regEmail").value.trim().toLowerCase();
+      const password = document.getElementById("regPassword").value.trim();
+      const error = document.getElementById("registerError");
 
       error.textContent = "";
       error.style.color = "red";
 
-      if (email === "" || password === "") {
-        error.textContent = "Bitte alles ausfüllen.";
+      if (usernameInput === "" || email === "" || password === "") {
+        error.textContent = "Bitte alle Felder vollständig ausfüllen.";
+        return;
+      }
+
+      if (password.length < 6) {
+        error.textContent = "Das Passwort muss mindestens 6 Zeichen lang sein.";
         return;
       }
 
@@ -243,62 +359,67 @@
       }
 
       try {
-        // Erster Versuch: Login
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        const userDoc = await getDoc(doc(db, "users", user.uid));
+        await setDoc(doc(db, "users", user.uid), {
+          username: usernameInput,
+          email: email,
+          approved: false
+        });
+
+        error.style.color = "green";
+        error.textContent = "Registriert! Warte jetzt auf deine Freischaltung durch den Admin.";
         
-        if (userDoc.exists() && userDoc.data().approved === true) {
-          showForum();
+        document.getElementById("regUsername").value = "";
+        document.getElementById("regEmail").value = "";
+        document.getElementById("regPassword").value = "";
+        
+        setTimeout(showLogin, 3000);
+
+      } catch (registerError) {
+        if (registerError.code === "auth/email-already-in-use") {
+          error.textContent = "Diese E-Mail-Adresse wird bereits verwendet.";
         } else {
-          error.textContent = "Du wurdest noch nicht freigeschaltet.";
-        }
-
-      } catch (loginError) {
-        // Zweiter Versuch: Wenn Login scheitert (weil Account neu ist), registrieren
-        if (loginError.code === "auth/user-not-found" || loginError.code === "auth/invalid-credential") {
-          try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            await setDoc(doc(db, "users", user.uid), {
-              email: email,
-              approved: false
-            });
-
-            error.style.color = "green";
-            error.textContent = "Registriert. Warte auf Freischaltung.";
-          } catch (registerError) {
-            error.textContent = "Fehler: " + registerError.message;
-          }
-        } else {
-          error.textContent = "Fehler: " + loginError.message;
+          error.textContent = "Fehler: " + registerError.message;
         }
       }
     };
 
-    // FORUM ZEIGEN
+    // FORUM ANZEIGEN
     function showForum() {
       document.getElementById("loginBox").style.display = "none";
+      document.getElementById("registerBox").style.display = "none";
+      document.getElementById("toggleBox").style.display = "none";
       document.getElementById("forumBox").style.display = "block";
       loadMessages();
     }
 
-    // NACHRICHTEN LADEN
+    // MESSAGES LADEN
     async function loadMessages() {
       const messagesContainer = document.getElementById("messages");
       messagesContainer.innerHTML = "";
 
       try {
+        const currentUser = auth.currentUser;
+        const isCurrentAdmin = (currentUser && currentUser.uid === adminUid);
+
         const q = query(collection(db, "Nachrichten"), orderBy("timestamp"));
         const querySnapshot = await getDocs(q);
         const now = Date.now();
 
+        const usersSnapshot = await getDocs(collection(db, "users"));
+        usersSnapshot.forEach((userDoc) => {
+          const userData = userDoc.data();
+          userCache[userDoc.id] = {
+            username: userData.username || "Anonym",
+            email: userData.email || ""
+          };
+        });
+
         querySnapshot.forEach((docSnap) => {
           const data = docSnap.data();
 
-          // Älter als 48 Stunden im UI überspringen
           const age = now - data.timestamp;
           if (age > 48 * 60 * 60 * 1000) {
             return;
@@ -309,12 +430,19 @@
 
           const textSpan = document.createElement("span");
 
-          // ABFRAGE: Ist es der Admin oder ein anonymer User?
           if (data.senderId === adminUid) {
             textSpan.textContent = "Admin: " + data.text;
-            messageDiv.style.background = "#28a745"; // Grüner Kasten für dich als Admin
+            messageDiv.style.background = "#28a745"; 
           } else {
-            textSpan.textContent = "Anonym: " + data.text;
+            const cachedUser = userCache[data.senderId];
+            const displayUsername = cachedUser ? cachedUser.username : "Anonym";
+            const displayEmail = cachedUser ? cachedUser.email : "";
+
+            if (isCurrentAdmin && displayEmail !== "") {
+              textSpan.textContent = `${displayUsername} (${displayEmail}): ${data.text}`;
+            } else {
+              textSpan.textContent = displayUsername + ": " + data.text;
+            }
           }
 
           const timeSpan = document.createElement("span");
@@ -332,7 +460,7 @@
       }
     }
 
-    // NACHRICHT SENDEN
+    // MESSAGES SENDEN
     window.sendMessage = async function() {
       const input = document.getElementById("messageInput");
       const text = input.value.trim();
@@ -351,7 +479,7 @@
           text: text,
           time: `${hours}:${minutes}`,
           timestamp: Date.now(),
-          senderId: currentUser.uid // Speichert die User-ID beim Senden mit ab
+          senderId: currentUser.uid
         });
 
         input.value = "";
@@ -361,19 +489,21 @@
       }
     };
 
-    // ENTER SENDEN
     document.getElementById("messageInput").addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
         sendMessage();
       }
     });
 
-    // PRÜFEN OB BEREITS EINGELOGGT UND FREIGESCHALTET
+    // PRÜFEN OB AKTUELL EINGELOGGT
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists() && userDoc.data().approved === true) {
           showForum();
+        } else {
+          document.getElementById("loginBox").style.display = "block";
+          document.getElementById("registerBox").style.display = "none";
         }
       }
     });
