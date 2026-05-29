@@ -150,6 +150,8 @@
       width: 100%;
       box-shadow: 0 5px 20px rgba(0,0,0,0.2);
       position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .popup-close {
@@ -170,6 +172,84 @@
       border-bottom: 1px solid #eee;
       padding-bottom: 8px;
     }
+
+    .hobby-inputs-container {
+      margin-top: 5px;
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hobby-input-wrapper { display: none; }
+    .hobby-input-wrapper.visible { display: block; }
+
+    .message-hobbies {
+      display: block;
+      font-size: 0.75rem;
+      font-style: italic;
+      opacity: 0.85;
+      margin-top: 4px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 4px;
+    }
+
+    /* POSTFACH / MAIL STYLING */
+    .mail-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .mail-item {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 12px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mail-text {
+      font-size: 0.95rem;
+      color: #333;
+      word-break: break-word;
+    }
+
+    .mail-meta {
+      font-size: 0.75rem;
+      color: #777;
+      margin-top: 4px;
+      display: block;
+    }
+
+    .mail-delete-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      width: auto;
+    }
+    .mail-delete-btn:hover { background: #bd2130; }
+
+    .msg-mail-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.8);
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-left: 6px;
+      padding: 0 4px;
+      display: inline-block;
+      width: auto;
+    }
+    .msg-mail-btn:hover { color: white; text-decoration: underline; }
 
     .rank-table {
       width: 100%;
@@ -217,10 +297,17 @@
       word-break:break-word;
     }
 
+    .message-content-wrapper {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
     .time{
       font-size:0.8rem;
       opacity:0.8;
       white-space:nowrap;
+      align-self: flex-start;
     }
 
     .input-area{
@@ -270,7 +357,6 @@
       padding-left: 5px;
     }
 
-    /* Zeichenzähler unter dem Input */
     .char-counter {
       font-size: 0.8rem;
       color: #777;
@@ -288,8 +374,6 @@
       font-size:0.9rem;
       line-height:1.5;
     }
-
-    .support-footer a { color:#007bff; text-decoration:none; }
 
     @media(max-width:1200px){
       .forum-sidebar-boxes {
@@ -347,6 +431,8 @@
       <div class="sidebar-box" onclick="openPopup('rankPopup')">Rangsystem anschauen</div>
       <div class="sidebar-box" onclick="openPopup('profilePopup')">Mein Profil</div>
       
+      <div class="sidebar-box" onclick="openPopup('mailboxPopup')" style="background: #e6f2ff; color: #007bff; border-color: #b3d7ff;">Mein Postfach ✉</div>
+      
       <div class="sidebar-box" id="adminClearBtn" style="display: none; color: white; background: #dc3545; border-color: #bd2130;" onclick="clearChatHistory()">Chatverlauf leeren</div>
       
       <div class="sidebar-box" onclick="logout()" style="color: red; border-color: #ffa0a0; margin-top: auto;">Abmelden</div>
@@ -380,6 +466,15 @@
       <input type="text" id="profNameInput" style="margin-top:5px; margin-bottom:4px;">
       <span class="name-hint" style="margin-bottom:15px; display:block;">Es wird empfohlen, keine echten Namen zu verwenden.</span>
       
+      <label style="font-size:0.9rem; font-weight:bold; color:#444;">Meine Hobbys:</label>
+      <div class="hobby-inputs-container">
+        <div class="hobby-input-wrapper visible" id="hobbyWrapper1"><input type="text" id="hobbyInput1" placeholder="Hobby 1" oninput="handleHobbyInputs()"></div>
+        <div class="hobby-input-wrapper" id="hobbyWrapper2"><input type="text" id="hobbyInput2" placeholder="Hobby 2" oninput="handleHobbyInputs()"></div>
+        <div class="hobby-input-wrapper" id="hobbyWrapper3"><input type="text" id="hobbyInput3" placeholder="Hobby 3" oninput="handleHobbyInputs()"></div>
+        <div class="hobby-input-wrapper" id="hobbyWrapper4"><input type="text" id="hobbyInput4" placeholder="Hobby 4" oninput="handleHobbyInputs()"></div>
+        <div class="hobby-input-wrapper" id="hobbyWrapper5"><input type="text" id="hobbyInput5" placeholder="Hobby 5" oninput="handleHobbyInputs()"></div>
+      </div>
+
       <p style="margin-bottom: 8px;"><strong>E-Mail:</strong> <span id="profEmail">-</span></p>
       <p style="margin-bottom: 8px;"><strong>Nachrichten gesamt:</strong> <span id="profCount">0</span></p>
       <p style="margin-bottom: 20px;"><strong>Aktueller Rang:</strong> <span id="profRank">-</span></p>
@@ -402,10 +497,32 @@
     </div>
   </div>
 
+  <div class="popup-overlay" id="sendMailPopup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup('sendMailPopup')">×</span>
+      <h3>Anonyme Nachricht senden</h3>
+      <p style="margin-bottom: 12px; font-size:0.95rem;">Empfänger: <strong id="mailTargetName">-</strong></p>
+      <input type="hidden" id="mailTargetUid">
+      
+      <div id="sendMailMessage" style="text-align:center; margin-bottom:10px; font-weight:bold;"></div>
+      <input type="text" id="mailTextInput" placeholder="Deine geheime Nachricht..." maxlength="300">
+      <button onclick="submitPrivateMail()">Abschicken</button>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="mailboxPopup">
+    <div class="popup-content" style="max-width: 500px;">
+      <span class="popup-close" onclick="closePopup('mailboxPopup')">×</span>
+      <h3>Mein Postfach</h3>
+      <div id="mailboxStatus" style="text-align:center; color:#777; font-style:italic; margin-top:15px;">Lade Nachrichten...</div>
+      <div class="mail-list" id="mailListContainer"></div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getAuth, setPersistence, browserSessionPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, addDoc, collection, getDocs, query, orderBy, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, addDoc, collection, getDocs, query, orderBy, onSnapshot, writeBatch, deleteDoc, where } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBiZgq5xE6CrOAKAYW0Jqj15UmL-r-RUgQ",
@@ -425,10 +542,12 @@
     const allowedDomains = ["gmail.com", "outlook.com", "yahoo.com"];
     const userCache = {};
     let unsubscribeMessages = null;
+    let unsubscribeMailbox = null;
 
     window.openPopup = function(id) {
       document.getElementById(id).style.display = "flex";
       if(id === 'profilePopup') { loadProfileData(); }
+      if(id === 'mailboxPopup') { listenToMailboxLive(); }
     }
 
     window.closePopup = function(id) { document.getElementById(id).style.display = "none"; }
@@ -442,6 +561,98 @@
       const container = document.getElementById("messages");
       if(direction === 'top') { container.scrollTop = 0; }
       else { container.scrollTop = container.scrollHeight; }
+    }
+
+    // INTERN: HOBBY BOX LOGIK
+    window.handleHobbyInputs = function() {
+      for (let i = 1; i <= 4; i++) {
+        const currentInput = document.getElementById(`hobbyInput${i}`);
+        const nextWrapper = document.getElementById(`hobbyWrapper${i+1}`);
+        if (currentInput.value.trim() !== "") { nextWrapper.classList.add("visible"); } 
+        else {
+          let subFieldsEmpty = true;
+          for(let j = i; j <= 5; j++) { if(document.getElementById(`hobbyInput${j}`).value.trim() !== "") subFieldsEmpty = false; }
+          if(subFieldsEmpty) { nextWrapper.classList.remove("visible"); document.getElementById(`hobbyInput${i+1}`).value = ""; }
+        }
+      }
+    }
+
+    // POP-UP FÜR DAS SENDEN DER MAIL ÖFFNEN
+    window.openSendMail = function(targetUid, targetName) {
+      if(auth.currentUser && auth.currentUser.uid === targetUid) {
+        alert("Du kannst dir selbst keine Nachricht schicken!");
+        return;
+      }
+      document.getElementById("mailTargetName").textContent = targetName;
+      document.getElementById("mailTargetUid").value = targetUid;
+      document.getElementById("mailTextInput").value = "";
+      document.getElementById("sendMailMessage").textContent = "";
+      openPopup("sendMailPopup");
+    }
+
+    // PRIVATNACHRICHT ABSCHICKEN
+    window.submitPrivateMail = async function() {
+      const targetUid = document.getElementById("mailTargetUid").value;
+      const text = document.getElementById("mailTextInput").value.trim();
+      const infoBox = document.getElementById("sendMailMessage");
+
+      if(text === "") { infoBox.style.color = "red"; infoBox.textContent = "Nachricht darf nicht leer sein!"; return; }
+
+      try {
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+        await addDoc(collection(db, "PrivatNachrichten"), {
+          empfaengerId: targetUid,
+          text: text,
+          time: timeStr,
+          timestamp: Date.now()
+        });
+
+        infoBox.style.color = "green";
+        infoBox.textContent = "Erfolgreich eingeworfen!";
+        setTimeout(() => { closePopup("sendMailPopup"); }, 1500);
+      } catch(err) {
+        infoBox.style.color = "red"; infoBox.textContent = "Fehler beim Senden.";
+      }
+    }
+
+    // MAILBOX LIVE ABBRUFEN (ECHTZEIT)
+    function listenToMailboxLive() {
+      if(unsubscribeMailbox) unsubscribeMailbox();
+      const u = auth.currentUser;
+      if(!u) return;
+
+      const container = document.getElementById("mailListContainer");
+      const status = document.getElementById("mailboxStatus");
+      const q = query(collection(db, "PrivatNachrichten"), where("empfaengerId", "==", u.uid), orderBy("timestamp", "desc"));
+
+      unsubscribeMailbox = onSnapshot(q, (snapshot) => {
+        container.innerHTML = "";
+        if(snapshot.empty) { status.style.display = "block"; status.textContent = "Dein Postfach ist im Moment leer."; return; }
+        status.style.display = "none";
+
+        snapshot.forEach((docSnap) => {
+          const m = docSnap.data();
+          const item = document.createElement("div");
+          item.classList.add("mail-item");
+
+          item.innerHTML = `
+            <div>
+              <span class="mail-text">${m.text}</span>
+              <span class="mail-meta">Eingegangen um ${m.time} Uhr</span>
+            </div>
+            <button class="mail-delete-btn" onclick="deleteMail('${docSnap.id}')">Löschen</button>
+          `;
+          container.appendChild(item);
+        });
+      });
+    }
+
+    // EINZELNE PRIVATE MAIL LÖSCHEN
+    window.deleteMail = async function(docId) {
+      try { await deleteDoc(doc(db, "PrivatNachrichten", docId)); } 
+      catch(err) { console.error("Fehler beim Löschen der Mail:", err); }
     }
 
     function getRankInfo(msgCount, uid) {
@@ -468,6 +679,13 @@
         document.getElementById("profCount").textContent = count;
         document.getElementById("profRank").textContent = r.name;
         document.getElementById("profRank").style.color = r.color;
+
+        const hobbies = d.hobbies || [];
+        for(let i = 1; i <= 5; i++) {
+          document.getElementById(`hobbyInput${i}`).value = hobbies[i-1] || "";
+          if(i > 1) document.getElementById(`hobbyWrapper${i}`).classList.remove("visible");
+        }
+        handleHobbyInputs();
       }
     }
 
@@ -476,16 +694,18 @@
       if(!u) return;
       const newName = document.getElementById("profNameInput").value.trim();
       const msgBox = document.getElementById("profileMessage");
-      
-      if(newName === "") {
-        msgBox.style.color = "red"; msgBox.textContent = "Name darf nicht leer sein!"; return;
+      if(newName === "") { msgBox.style.color = "red"; msgBox.textContent = "Name darf nicht leer sein!"; return; }
+
+      const hobbiesArray = [];
+      for(let i = 1; i <= 5; i++) {
+        const hVal = document.getElementById(`hobbyInput${i}`).value.trim();
+        if(hVal !== "") hobbiesArray.push(hVal);
       }
+
       try {
-        await updateDoc(doc(db, "users", u.uid), { username: newName });
-        msgBox.style.color = "green"; msgBox.textContent = "Username aktualisiert!";
-      } catch(err) {
-        msgBox.style.color = "red"; msgBox.textContent = "Fehler beim Speichern.";
-      }
+        await updateDoc(doc(db, "users", u.uid), { username: newName, hobbies: hobbiesArray });
+        msgBox.style.color = "green"; msgBox.textContent = "Profil erfolgreich aktualisiert!";
+      } catch(err) { msgBox.style.color = "red"; msgBox.textContent = "Fehler beim Speichern."; }
     }
 
     window.showRegister = function() {
@@ -536,7 +756,7 @@
 
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, "users", userCredential.user.uid), { username: usernameInput, email: email, approved: false, msgCount: 0 });
+        await setDoc(doc(db, "users", userCredential.user.uid), { username: usernameInput, email: email, approved: false, msgCount: 0, hobbies: [] });
         error.style.color = "green"; error.textContent = "Registriert! Warte auf Freischaltung.";
         setTimeout(showLogin, 3000);
       } catch (err) { error.textContent = "Fehler bei Registrierung."; }
@@ -544,11 +764,11 @@
 
     window.logout = async function() {
       if(unsubscribeMessages) unsubscribeMessages();
+      if(unsubscribeMailbox) unsubscribeMailbox();
       await signOut(auth);
       location.reload();
     }
 
-    // ADMIN FUNKTION: VERLAUF LÖSCHEN
     window.clearChatHistory = async function() {
       if (auth.currentUser && auth.currentUser.uid === adminUid) {
         if(confirm("Möchtest du wirklich alle Nachrichten im Chat unwiderruflich löschen?")) {
@@ -567,14 +787,10 @@
       document.getElementById("registerBox").style.display = "none";
       document.getElementById("toggleBox").style.display = "none";
       document.getElementById("forumBox").style.display = "block";
-      
-      if(auth.currentUser.uid === adminUid) {
-        document.getElementById("adminClearBtn").style.display = "block";
-      }
+      if(auth.currentUser.uid === adminUid) { document.getElementById("adminClearBtn").style.display = "block"; }
       listenToMessagesLive();
     }
 
-    // LIVE INTERN: Echtzeit-Aktualisierung mit onSnapshot
     function listenToMessagesLive() {
       const messagesContainer = document.getElementById("messages");
       const q = query(collection(db, "Nachrichten"), orderBy("timestamp"));
@@ -585,7 +801,7 @@
         const usersSnapshot = await getDocs(collection(db, "users"));
         usersSnapshot.forEach((userDoc) => {
           const userData = userDoc.data();
-          userCache[userDoc.id] = { username: userData.username || "Anonym", email: userData.email || "", msgCount: userData.msgCount || 0 };
+          userCache[userDoc.id] = { username: userData.username || "Anonym", email: userData.email || "", msgCount: userData.msgCount || 0, hobbies: userData.hobbies || [] };
         });
 
         snapshot.forEach((docSnap) => {
@@ -593,27 +809,44 @@
           const messageDiv = document.createElement("div");
           messageDiv.classList.add("message");
 
+          const wrapperDiv = document.createElement("div");
+          wrapperDiv.classList.add("message-content-wrapper");
+
           const textSpan = document.createElement("span");
           const cachedUser = userCache[data.senderId];
           const displayUsername = cachedUser ? cachedUser.username : "Anonym";
           const count = cachedUser ? cachedUser.msgCount : 0;
+          const userHobbies = cachedUser ? cachedUser.hobbies : [];
 
           const rank = getRankInfo(count, data.senderId);
           messageDiv.style.background = rank.color;
 
           const badgeHTML = `<span class="rank-badge" style="background: rgba(0,0,0,0.25);">${rank.name}</span>`;
+          
+          // HIER WIRD DER PRIVATNACHRICHT-BUTTON NEBEN DEN USERNAMEN GEBAUT
+          const escapedName = displayUsername.replace(/['"]/g, '');
+          const mailButtonHTML = `<button class="msg-mail-btn" onclick="openSendMail('${data.senderId}', '${escapedName}')">[✉]</button>`;
 
           if (data.senderId === adminUid) {
             textSpan.innerHTML = `<strong>Admin ${badgeHTML}:</strong> ${data.text}`;
           } else {
-            textSpan.innerHTML = `<strong>${displayUsername}</strong> ${badgeHTML}: ${data.text}`;
+            textSpan.innerHTML = `<strong>${displayUsername}</strong>${mailButtonHTML} ${badgeHTML}: ${data.text}`;
+          }
+
+          wrapperDiv.appendChild(textSpan);
+
+          if(userHobbies.length > 0) {
+            const hobbiesSpan = document.createElement("span");
+            hobbiesSpan.classList.add("message-hobbies");
+            hobbiesSpan.textContent = `Hobbys: ${userHobbies.join(", ")}`;
+            wrapperDiv.appendChild(hobbiesSpan);
           }
 
           const timeSpan = document.createElement("span");
           timeSpan.classList.add("time");
           timeSpan.textContent = data.time;
 
-          messageDiv.appendChild(textSpan);
+          messageDiv.appendChild(wrapperDiv);
           messageDiv.appendChild(timeSpan);
           messagesContainer.appendChild(messageDiv);
         });
@@ -630,11 +863,10 @@
       if (!currentUser) return;
 
       const now = new Date();
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
       try {
-        await addDoc(collection(db, "Nachrichten"), { text: text, time: `${hours}:${minutes}`, timestamp: Date.now(), senderId: currentUser.uid });
+        await addDoc(collection(db, "Nachrichten"), { text: text, time: timeStr, timestamp: Date.now(), senderId: currentUser.uid });
         await updateDoc(doc(db, "users", currentUser.uid), { msgCount: increment(1) });
         input.value = "";
         updateCharCounter();
