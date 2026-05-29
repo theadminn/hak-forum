@@ -82,7 +82,7 @@
     .forum-sidebar-boxes {
       position: absolute;
       top: 20px;
-      right: -240px; /* Standardmäßig rechts neben dem Forum platziert */
+      right: -240px;
       width: 220px;
       display: flex;
       flex-direction: column;
@@ -384,7 +384,8 @@
       <div id="profileMessage" style="text-align:center; margin-bottom:10px; font-weight:bold;"></div>
       
       <label style="font-size:0.9rem; font-weight:bold; color:#444;">Username ändern:</label>
-      <input type="text" id="profNameInput" style="margin-top:5px; margin-bottom:15px;">
+      <input type="text" id="profNameInput" style="margin-top:5px; margin-bottom:4px;">
+      <span class="name-hint" style="margin-bottom:15px; display:block;">Es wird empfohlen, keine echten Namen zu verwenden.</span>
       
       <p style="margin-bottom: 8px;"><strong>E-Mail:</strong> <span id="profEmail">-</span></p>
       <p style="margin-bottom: 8px;"><strong>Nachrichten gesamt:</strong> <span id="profCount">0</span></p>
@@ -411,7 +412,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    // browserSessionPersistence importiert, um dauerhaften Login zu verhindern
+    import { getAuth, setPersistence, browserSessionPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, addDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     // FIREBASE CONFIG
@@ -497,7 +499,6 @@
         msgBox.style.color = "green";
         msgBox.textContent = "Username erfolgreich aktualisiert!";
         
-        // Chat im Hintergrund sofort aktualisieren
         loadMessages();
       } catch(err) {
         msgBox.style.color = "red";
@@ -520,7 +521,7 @@
       document.getElementById("toLoginText").style.display = "none";
     }
 
-    // LOGIN
+    // LOGIN (Mit erzwungener Session-Persistenz)
     window.login = async function() {
       const email = document.getElementById("loginEmail").value.trim().toLowerCase();
       const password = document.getElementById("loginPassword").value.trim();
@@ -533,6 +534,9 @@
       }
 
       try {
+        // Ändert die Persistenz, sodass der User beim Schließen des Tabs ausgeloggt wird
+        await setPersistence(auth, browserSessionPersistence);
+        
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         const userDoc = await getDoc(doc(db, "users", user.uid));
