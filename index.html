@@ -251,6 +251,25 @@
     }
     .msg-mail-btn:hover { color: white; text-decoration: underline; }
 
+    /* NEU: Klickbarer Username Style */
+    .chat-username-clickable {
+      cursor: pointer;
+    }
+    .chat-username-clickable:hover {
+      text-decoration: underline;
+    }
+
+    /* ADMIN E-MAIL DISPLAY IM CHAT */
+    .admin-visible-email {
+      font-size: 0.8rem;
+      font-weight: normal;
+      opacity: 0.85;
+      background: rgba(0, 0, 0, 0.15);
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-left: 5px;
+    }
+
     .rank-table {
       width: 100%;
       border-collapse: collapse;
@@ -456,6 +475,16 @@
     </div>
   </div>
 
+  <div class="popup-overlay" id="userViewPopup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup('userViewPopup')">×</span>
+      <h3 id="viewTitle">Profil von ...</h3>
+      <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Username:</strong> <span id="viewName">-</span></p>
+      <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Rang:</strong> <span id="viewRank">-</span></p>
+      <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Hobbys:</strong> <span id="viewHobbies">-</span></p>
+    </div>
+  </div>
+
   <div class="popup-overlay" id="profilePopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('profilePopup')">×</span>
@@ -552,11 +581,23 @@
     const allowedDomains = ["gmail.com", "outlook.com", "yahoo.com"];
     
     const userCache = {};
-    const adminMailCache = {}; // Cache um festzuhalten, wer Mails mit dem Admin hat
+    const adminMailCache = {};
 
     let unsubscribeMessages = null;
     let unsubscribeMailbox = null;
     let unsubscribeAdminMails = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        getDoc(doc(db, "users", user.uid)).then((userDoc) => {
+          if (userDoc.exists() && userDoc.data().approved === true) {
+            showForum();
+          } else {
+            auth.signOut();
+          }
+        });
+      }
+    });
 
     window.openPopup = function(id) {
       document.getElementById(id).style.display = "flex";
@@ -565,6 +606,32 @@
     }
 
     window.closePopup = function(id) { document.getElementById(id).style.display = "none"; }
+
+    // NEU: Funktion zum Öffnen der Profil-Ansicht eines anderen Users
+    window.openUserView = function(userId) {
+      const cachedUser = userCache[userId];
+      if (!cachedUser) return;
+
+      const userHasAdminMails = adminMailCache[userId] || false;
+      const rank = getRankInfo(cachedUser.msgCount, userId, userHasAdminMails);
+      
+      document.getElementById("viewTitle").textContent = `Profil von ${cachedUser.username}`;
+      document.getElementById("viewName").textContent = cachedUser.username;
+      
+      const rankSpan = document.getElementById("viewRank");
+      rankSpan.textContent = rank.name;
+      rankSpan.style.color = rank.color;
+      rankSpan.style.fontWeight = "bold";
+
+      const hobbiesSpan = document.getElementById("viewHobbies");
+      if (cachedUser.hobbies && cachedUser.hobbies.length > 0) {
+        hobbiesSpan.textContent = cachedUser.hobbies.join(", ");
+      } else {
+        hobbiesSpan.textContent = "Keine Hobbys angegeben";
+      }
+
+      openPopup("userViewPopup");
+    }
 
     window.updateCharCounter = function() {
       const len = document.getElementById("messageInput").value.length;
@@ -687,7 +754,6 @@
 
     function getRankInfo(msgCount, uid, hasMailsWithAdmin) {
       if (uid === adminUid) return { name: "Admin", color: "#28a745" };
-      if (msgCount >= 10000 && hasMailsWithAdmin) return { name: "Secret", color: "#1a1a1a" };
       
       if (msgCount <= 100) return { name: "Noob", color: "#8B4513" };
       if (msgCount <= 400) return { name: "Pro", color: "#007bff" };
@@ -712,8 +778,8 @@
         document.getElementById("profEmail").textContent = d.email || "";
         document.getElementById("profCount").textContent = count;
         
-        document.getElementById("profRank").textContent = (r.name === "Secret") ? "Admin-Like" : r.name;
-        document.getElementById("profRank").style.color = (r.name === "Secret") ? "#28a745" : r.color;
+        document.getElementById("profRank").textContent = r.name;
+        document.getElementById("profRank").style.color = r.color;
 
         const hobbies = d.hobbies || [];
         for(let i = 1; i <= 5; i++) {
@@ -814,14 +880,13 @@
       startGlobalListeners();
     }
 
-    // DIE LÖSUNG: Eigene, ressourcenschonende Echtzeit-Listener abseits des Chatverlaufs
     function startGlobalListeners() {
-      // 1. User-Datenbank live cachen (für Ränge & Namen)
       onSnapshot(collection(db, "users"), (snapshot) => {
         snapshot.forEach((userDoc) => {
           const userData = userDoc.data();
           userCache[userDoc.id] = { 
             username: userData.username || "Anonym", 
+            email: userData.email || "", 
             msgCount: userData.msgCount || 0, 
             hobbies: userData.hobbies || []
           };
@@ -829,9 +894,7 @@
         checkSecretRankRequirements();
       });
 
-      // 2. PrivatNachrichten live überwachen, um Admin-Mails im Hintergrund zu verknüpfen
       unsubscribeAdminMails = onSnapshot(collection(db, "PrivatNachrichten"), (snapshot) => {
-        // Cache zurücksetzen
         for (const key in adminMailCache) { adminMailCache[key] = false; }
         
         snapshot.forEach((pmDoc) => {
@@ -842,7 +905,6 @@
         checkSecretRankRequirements();
       });
 
-      // 3. Erst wenn Caches bereit sind, laden wir den Chatverlauf flüssig
       listenToMessagesLive();
     }
 
@@ -864,27 +926,30 @@
           const textSpan = document.createElement("span");
           const cachedUser = userCache[data.senderId];
           const displayUsername = cachedUser ? cachedUser.username : "Anonym";
+          const userEmail = cachedUser ? cachedUser.email : ""; 
           const count = cachedUser ? cachedUser.msgCount : 0;
           const userHobbies = cachedUser ? cachedUser.hobbies : [];
           
-          // Holt den Status blitzschnell aus dem Hintergrund-Cache ohne DB-Anfrage
           const userHasAdminMails = adminMailCache[data.senderId] || false;
 
           const rank = getRankInfo(count, data.senderId, userHasAdminMails);
           messageDiv.style.background = rank.color;
 
           let badgeHTML = `<span class="rank-badge" style="background: rgba(0,0,0,0.25);">${rank.name}</span>`;
-          if (rank.name === "Secret") {
-            badgeHTML = `<span class="rank-badge" style="background: #ff0000; color: #fff;">[X]</span>`;
-          }
 
           const escapedName = displayUsername.replace(/['"]/g, '');
           const mailButtonHTML = `<button class="msg-mail-btn" onclick="openSendMail('${data.senderId}', '${escapedName}')">[✉]</button>`;
 
+          let emailHTML = "";
+          if (auth.currentUser && auth.currentUser.uid === adminUid && userEmail !== "") {
+            emailHTML = `<span class="admin-visible-email">(${userEmail})</span>`;
+          }
+
+          // Geändert: Usernamen bekommen das onclick-Event zum Öffnen der Profilansicht
           if (data.senderId === adminUid) {
-            textSpan.innerHTML = `<strong>Admin ${badgeHTML}:</strong> ${data.text}`;
+            textSpan.innerHTML = `<strong class="chat-username-clickable" onclick="openUserView('${data.senderId}')">Admin</strong> ${badgeHTML}: ${data.text}`;
           } else {
-            textSpan.innerHTML = `<strong>${displayUsername}</strong>${mailButtonHTML} ${badgeHTML}: ${data.text}`;
+            textSpan.innerHTML = `<strong class="chat-username-clickable" onclick="openUserView('${data.senderId}')">${displayUsername}</strong>${emailHTML}${mailButtonHTML} ${badgeHTML}: ${data.text}`;
           }
 
           wrapperDiv.appendChild(textSpan);
@@ -911,34 +976,31 @@
     window.sendMessage = async function() {
       const input = document.getElementById("messageInput");
       const text = input.value.trim();
-      if (text === "" || text.length > 500) return;
-
-      const currentUser = auth.currentUser;
-      if (!currentUser) return;
-
-      const now = new Date();
-      const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      if (text === "" || !auth.currentUser) return;
 
       try {
-        await addDoc(collection(db, "Nachrichten"), { text: text, time: timeStr, timestamp: Date.now(), senderId: currentUser.uid });
-        await updateDoc(doc(db, "users", currentUser.uid), { msgCount: increment(1) });
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+        const uid = auth.currentUser.uid;
+
+        await addDoc(collection(db, "Nachrichten"), {
+          senderId: uid,
+          text: text,
+          time: timeStr,
+          timestamp: Date.now()
+        });
+
+        await updateDoc(doc(db, "users", uid), {
+          msgCount: increment(1)
+        });
+
         input.value = "";
         updateCharCounter();
-        checkSecretRankRequirements();
-      } catch (err) { console.error("Fehler beim Senden:", err); }
-    };
-
-    document.getElementById("messageInput").addEventListener("keypress", function(event) {
-      if (event.key === "Enter") sendMessage();
-    });
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists() && userDoc.data().approved === true) { showForum(); } 
-        else { document.getElementById("loginBox").style.display = "block"; }
+      } catch (err) {
+        console.error("Fehler beim Senden der Nachricht:", err);
+        alert("Nachricht konnte nicht gesendet werden.");
       }
-    });
+    };
   </script>
 </body>
 </html>
