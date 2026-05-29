@@ -25,7 +25,7 @@
       position:relative;
     }
 
-    /* Box oben rechts für den Wechsel zwischen Login und Register */
+    /* Box oben rechts NUR für den Wechsel im Login-Bereich */
     .toggle-box {
       position: absolute;
       top: 20px;
@@ -54,6 +54,7 @@
       border-radius:15px;
       padding:20px;
       box-shadow:0 4px 15px rgba(0,0,0,0.1);
+      position: relative;
     }
 
     .register-box,
@@ -61,11 +62,120 @@
       display:none;
     }
 
-    h1{
-      text-align:center;
-      margin-bottom:25px;
+    /* Header im Forum */
+    .forum-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+
+    h1 {
       color:#222;
       font-size:2rem;
+      margin: 0;
+    }
+
+    /* Die zwei Boxen oben rechts IM CHAT */
+    .forum-sidebar-boxes {
+      position: absolute;
+      top: 20px;
+      right: -240px; /* Standardmäßig rechts neben dem Forum platziert */
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sidebar-box {
+      background: white;
+      padding: 12px 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: bold;
+      text-align: center;
+      color: #333;
+      transition: transform 0.2s, background 0.2s;
+      border: 1px solid #ddd;
+    }
+
+    .sidebar-box:hover {
+      transform: translateY(-2px);
+      background: #f0f7ff;
+      color: #007bff;
+    }
+
+    /* Overlays / Popups für Profil & Ränge */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .popup-content {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 450px;
+      width: 100%;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    /* Das X oben rechts im Fenster */
+    .popup-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #999;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+
+    .popup-close:hover {
+      color: #ff0000;
+    }
+
+    .popup-content h3 {
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+    }
+
+    /* Rangliste Tabelle */
+    .rank-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .rank-table td {
+      padding: 8px 5px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+    }
+
+    /* Badge-Styling im Chat */
+    .rank-badge {
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      color: white;
+      text-transform: uppercase;
     }
 
     .messages{
@@ -138,7 +248,6 @@
       text-align:center;
     }
 
-    /* Hinweis unter dem Username Feld */
     .name-hint {
       display: block;
       color: #777;
@@ -149,7 +258,6 @@
       padding-left: 5px;
     }
 
-    /* Handygerechter Support-Text am Fuß der Boxen */
     .support-footer {
       text-align:center;
       margin-top:20px;
@@ -178,11 +286,17 @@
       font-style:italic;
     }
 
-    .forum-logo {
-      display: block;
-      margin: 0 auto 20px;
-      max-width: 150px;
-      height: auto;
+    /* Handy-Optimierung für die seitlichen Boxen */
+    @media(max-width:1200px){
+      .forum-sidebar-boxes {
+        position: static;
+        width: 100%;
+        margin-bottom: 15px;
+        flex-direction: row;
+      }
+      .sidebar-box {
+        flex: 1;
+      }
     }
 
     @media(max-width:600px){
@@ -192,18 +306,10 @@
         width: 100%;
         text-align: center;
       }
-
-      h1{
-        font-size:1.5rem;
-      }
-
-      .messages{
-        height:300px;
-      }
-
-      .input-area{
-        flex-direction:column;
-      }
+      h1{ font-size:1.5rem; }
+      .messages{ height:300px; }
+      .input-area{ flex-direction:column; }
+      .forum-sidebar-boxes { flex-direction: column; }
     }
   </style>
 </head>
@@ -216,7 +322,7 @@
   </div>
 
   <div class="login-box" id="loginBox">
-    <h1>HAK-Sacre-coeur</h1>
+    <h1 style="text-align:center; margin-bottom:25px;">HAK-Sacre-coeur</h1>
     <div class="error" id="loginError"></div>
 
     <input type="email" id="loginEmail" placeholder="E-Mail">
@@ -225,13 +331,13 @@
     <button onclick="login()">Anmelden</button>
 
     <div class="support-footer">
-      Bei Fragen an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
+      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
       <span class="reload-hint">Falls neue Nachrichten nicht geladen werden, bitte die Seite neu laden.</span>
     </div>
   </div>
 
   <div class="register-box" id="registerBox">
-    <h1>Konto erstellen</h1>
+    <h1 style="text-align:center; margin-bottom:25px;">Konto erstellen</h1>
     <div class="error" id="registerError"></div>
 
     <input type="text" id="regUsername" placeholder="Wunsch-Username">
@@ -243,12 +349,21 @@
     <button onclick="register()">Registrieren</button>
 
     <div class="support-footer">
-      Bei Fragen an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
+      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
     </div>
   </div>
 
   <div class="forum-box" id="forumBox">
-    <h1>HAK-Sacre-coeur</h1>
+    <div class="forum-header">
+      <h1>HAK-Sacre-coeur</h1>
+    </div>
+
+    <div class="forum-sidebar-boxes">
+      <div class="sidebar-box" onclick="openPopup('rankPopup')">Rangsystem anschauen</div>
+      <div class="sidebar-box" onclick="openPopup('profilePopup')">Mein Profil</div>
+      <div class="sidebar-box" onclick="logout()" style="color: red; border-color: #ffa0a0;">Abmelden</div>
+    </div>
+
     <div class="messages" id="messages"></div>
 
     <div class="input-area">
@@ -257,15 +372,47 @@
     </div>
 
     <div class="support-footer">
-      Bei Fragen an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
+      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
       <span class="reload-hint">Falls neue Nachrichten nicht geladen werden, bitte die Seite neu laden.</span>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="profilePopup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup('profilePopup')">×</span>
+      <h3>Mein Profil</h3>
+      <div id="profileMessage" style="text-align:center; margin-bottom:10px; font-weight:bold;"></div>
+      
+      <label style="font-size:0.9rem; font-weight:bold; color:#444;">Username ändern:</label>
+      <input type="text" id="profNameInput" style="margin-top:5px; margin-bottom:15px;">
+      
+      <p style="margin-bottom: 8px;"><strong>E-Mail:</strong> <span id="profEmail">-</span></p>
+      <p style="margin-bottom: 8px;"><strong>Nachrichten gesamt:</strong> <span id="profCount">0</span></p>
+      <p style="margin-bottom: 20px;"><strong>Aktueller Rang:</strong> <span id="profRank">-</span></p>
+      
+      <button onclick="saveProfileName()">Änderungen speichern</button>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="rankPopup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup('rankPopup')">×</span>
+      <h3>Das Rangsystem</h3>
+      <p style="font-size: 0.9rem; color: #555; margin-bottom: 10px;">Erreichte Meilensteine schalten automatisch neue Ränge und Chat-Farben frei:</p>
+      <table class="rank-table">
+        <tr style="color: #8B4513; font-weight: bold;"><td>Noob</td><td>0 - 100 Texte</td></tr>
+        <tr style="color: #007bff; font-weight: bold;"><td>Pro</td><td>101 - 400 Texte</td></tr>
+        <tr style="color: #8a2be2; font-weight: bold;"><td>Champ</td><td>401 - 1000 Texte</td></tr>
+        <tr style="color: #ffd700; font-weight: bold; background: #fffdf0;"><td>Admin-Lite</td><td>1001 - 3000 Texte</td></tr>
+        <tr style="color: #28a745; font-weight: bold; background: #f0fdf4;"><td>Admin-Like</td><td>Ab 3001 Texte</td></tr>
+      </table>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, addDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, addDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     // FIREBASE CONFIG
     const firebaseConfig = {
@@ -285,10 +432,80 @@
     const adminUid = "yY81pFPtCHfEzjUyA0bcVlhO0cv1";
     const allowedDomains = ["gmail.com", "outlook.com", "yahoo.com"];
     
-    // Im Cache werden nun Name UND E-Mail gespeichert
     const userCache = {};
 
-    // WECHSEL-FUNKTIONEN
+    // POPUP STEUERUNG
+    window.openPopup = function(id) {
+      document.getElementById(id).style.display = "flex";
+      if(id === 'profilePopup') { loadProfileData(); }
+    }
+
+    window.closePopup = function(id) {
+      document.getElementById(id).style.display = "none";
+    }
+
+    // Rangrechner anhand der Nachrichtenanzahl
+    function getRankInfo(msgCount, uid) {
+      if (uid === adminUid) {
+        return { name: "Admin", color: "#28a745" };
+      }
+      if (msgCount <= 100) return { name: "Noob", color: "#8B4513" };
+      if (msgCount <= 400) return { name: "Pro", color: "#007bff" };
+      if (msgCount <= 1000) return { name: "Champ", color: "#8a2be2" };
+      if (msgCount <= 3000) return { name: "Admin-Lite", color: "#ffd700" };
+      return { name: "Admin-Like", color: "#28a745" };
+    }
+
+    // Profildaten im Popup laden
+    async function loadProfileData() {
+      const u = auth.currentUser;
+      if(!u) return;
+      document.getElementById("profileMessage").textContent = "";
+      const uDoc = await getDoc(doc(db, "users", u.uid));
+      if(uDoc.exists()) {
+        const d = uDoc.data();
+        const count = d.msgCount || 0;
+        const r = getRankInfo(count, u.uid);
+        
+        document.getElementById("profNameInput").value = d.username || "Anonym";
+        document.getElementById("profEmail").textContent = d.email || "";
+        document.getElementById("profCount").textContent = count;
+        document.getElementById("profRank").textContent = r.name;
+        document.getElementById("profRank").style.color = r.color;
+        document.getElementById("profRank").style.fontWeight = "bold";
+      }
+    }
+
+    // USERNAME IN FIREBASE SPEICHERN
+    window.saveProfileName = async function() {
+      const u = auth.currentUser;
+      if(!u) return;
+      
+      const newName = document.getElementById("profNameInput").value.trim();
+      const msgBox = document.getElementById("profileMessage");
+      
+      if(newName === "") {
+        msgBox.style.color = "red";
+        msgBox.textContent = "Name darf nicht leer sein!";
+        return;
+      }
+      
+      try {
+        await updateDoc(doc(db, "users", u.uid), {
+          username: newName
+        });
+        msgBox.style.color = "green";
+        msgBox.textContent = "Username erfolgreich aktualisiert!";
+        
+        // Chat im Hintergrund sofort aktualisieren
+        loadMessages();
+      } catch(err) {
+        msgBox.style.color = "red";
+        msgBox.textContent = "Fehler beim Speichern.";
+      }
+    }
+
+    // LOGIN / REGISTER WECHSEL
     window.showRegister = function() {
       document.getElementById("loginBox").style.display = "none";
       document.getElementById("registerBox").style.display = "block";
@@ -308,7 +525,6 @@
       const email = document.getElementById("loginEmail").value.trim().toLowerCase();
       const password = document.getElementById("loginPassword").value.trim();
       const error = document.getElementById("loginError");
-
       error.textContent = "";
 
       if (email === "" || password === "") {
@@ -319,7 +535,6 @@
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
         const userDoc = await getDoc(doc(db, "users", user.uid));
         
         if (userDoc.exists() && userDoc.data().approved === true) {
@@ -366,7 +581,8 @@
         await setDoc(doc(db, "users", user.uid), {
           username: usernameInput,
           email: email,
-          approved: false
+          approved: false,
+          msgCount: 0 
         });
 
         error.style.color = "green";
@@ -377,7 +593,6 @@
         document.getElementById("regPassword").value = "";
         
         setTimeout(showLogin, 3000);
-
       } catch (registerError) {
         if (registerError.code === "auth/email-already-in-use") {
           error.textContent = "Diese E-Mail-Adresse wird bereits verwendet.";
@@ -387,7 +602,12 @@
       }
     };
 
-    // FORUM ANZEIGEN
+    // LOGOUT
+    window.logout = async function() {
+      await signOut(auth);
+      location.reload();
+    }
+
     function showForum() {
       document.getElementById("loginBox").style.display = "none";
       document.getElementById("registerBox").style.display = "none";
@@ -403,48 +623,46 @@
 
       try {
         const currentUser = auth.currentUser;
-        // Checken, ob die Person, die gerade auf die Seite guckt, der Admin ist
         const isCurrentAdmin = (currentUser && currentUser.uid === adminUid);
 
         const q = query(collection(db, "Nachrichten"), orderBy("timestamp"));
         const querySnapshot = await getDocs(q);
-        const now = Date.now();
 
         const usersSnapshot = await getDocs(collection(db, "users"));
         usersSnapshot.forEach((userDoc) => {
           const userData = userDoc.data();
           userCache[userDoc.id] = {
             username: userData.username || "Anonym",
-            email: userData.email || ""
+            email: userData.email || "" ,
+            msgCount: userData.msgCount || 0
           };
         });
 
         querySnapshot.forEach((docSnap) => {
           const data = docSnap.data();
 
-          const age = now - data.timestamp;
-          if (age > 48 * 60 * 60 * 1000) {
-            return;
-          }
-
           const messageDiv = document.createElement("div");
           messageDiv.classList.add("message");
 
           const textSpan = document.createElement("span");
 
-          if (data.senderId === adminUid) {
-            textSpan.textContent = "Admin: " + data.text;
-            messageDiv.style.background = "#28a745"; 
-          } else {
-            const cachedUser = userCache[data.senderId];
-            const displayUsername = cachedUser ? cachedUser.username : "Anonym";
-            const displayEmail = cachedUser ? cachedUser.email : "";
+          const cachedUser = userCache[data.senderId];
+          const displayUsername = cachedUser ? cachedUser.username : "Anonym";
+          const displayEmail = cachedUser ? cachedUser.email : "";
+          const count = cachedUser ? cachedUser.msgCount : 0;
 
-            // HIER PASSIERT DIE PRÜFUNG: Nur der Admin sieht die E-Mail-Adresse im Chat
+          const rank = getRankInfo(count, data.senderId);
+          messageDiv.style.background = rank.color;
+
+          const badgeHTML = `<span class="rank-badge" style="background: rgba(0,0,0,0.25);">${rank.name}</span>`;
+
+          if (data.senderId === adminUid) {
+            textSpan.innerHTML = `<strong>Admin ${badgeHTML}:</strong> ${data.text}`;
+          } else {
             if (isCurrentAdmin && displayEmail !== "") {
-              textSpan.textContent = `${displayUsername} (${displayEmail}): ${data.text}`;
+              textSpan.innerHTML = `<strong>${displayUsername}</strong> (${displayEmail}) ${badgeHTML}: ${data.text}`;
             } else {
-              textSpan.textContent = displayUsername + ": " + data.text;
+              textSpan.innerHTML = `<strong>${displayUsername}</strong> ${badgeHTML}: ${data.text}`;
             }
           }
 
@@ -485,6 +703,10 @@
           senderId: currentUser.uid
         });
 
+        await updateDoc(doc(db, "users", currentUser.uid), {
+          msgCount: increment(1)
+        });
+
         input.value = "";
         loadMessages();
       } catch (err) {
@@ -498,7 +720,6 @@
       }
     });
 
-    // PRÜFEN OB AKTUELL EINGELOGGT
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userDoc = await getDoc(doc(db, "users", user.uid));
