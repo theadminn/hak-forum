@@ -76,6 +76,7 @@
     .input-area{
       display:flex;
       gap:10px;
+      margin-bottom:15px;
     }
 
     input{
@@ -85,6 +86,10 @@
       border:1px solid #ccc;
       font-size:1rem;
       margin-bottom:12px;
+    }
+
+    .input-area input {
+      margin-bottom:0;
     }
 
     button{
@@ -106,6 +111,27 @@
       color:red;
       margin-bottom:10px;
       text-align:center;
+    }
+
+    /* Handygerechter Support-Text am Fuß der Boxen */
+    .support-footer {
+      text-align:center;
+      margin-top:20px;
+      padding-top:15px;
+      border-top:1px solid #eee;
+      color:#666;
+      font-size:0.9rem;
+      line-height:1.4;
+      word-break:break-word;
+    }
+
+    .support-footer a {
+      color:#007bff;
+      text-decoration:none;
+    }
+
+    .support-footer a:hover {
+      text-decoration:underline;
     }
 
     @media(max-width:600px){
@@ -140,6 +166,10 @@
     <button onclick="login()">
       Anmelden / Registrieren
     </button>
+
+    <div class="support-footer">
+      Bei Fragen an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
+    </div>
   </div>
 
   <div class="forum-box" id="forumBox">
@@ -149,6 +179,10 @@
     <div class="input-area">
       <input type="text" id="messageInput" placeholder="Nachricht schreiben...">
       <button onclick="sendMessage()">Senden</button>
+    </div>
+
+    <div class="support-footer">
+      Bei Fragen an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
     </div>
   </div>
 
