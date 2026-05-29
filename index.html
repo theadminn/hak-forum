@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>HAK-Sacre-coeur Forum</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }
+
+    body{
+      background:#f2f2f2;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+    }
+
+    .login-box,
+    .forum-box{
+      width:100%;
+      max-width:700px;
+      background:white;
+      border-radius:15px;
+      padding:20px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .forum-box{
+      display:none;
+    }
+
+    h1{
+      text-align:center;
+      margin-bottom:25px;
+      color:#222;
+      font-size:2rem;
+    }
+
+    .messages{
+      height:400px;
+      overflow-y:auto;
+      border:1px solid #ddd;
+      border-radius:10px;
+      padding:10px;
+      background:#fafafa;
+      margin-bottom:15px;
+    }
+
+    .message{
+      background:#007bff;
+      color:white;
+      padding:12px;
+      border-radius:12px;
+      margin-bottom:10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      word-break:break-word;
+    }
+
+    .time{
+      font-size:0.8rem;
+      opacity:0.8;
+      white-space:nowrap;
+    }
+
+    .input-area{
+      display:flex;
+      gap:10px;
+    }
+
+    input{
+      width:100%;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #ccc;
+      font-size:1rem;
+      margin-bottom:12px;
+    }
+
+    button{
+      padding:12px 18px;
+      border:none;
+      border-radius:10px;
+      background:#007bff;
+      color:white;
+      cursor:pointer;
+      transition:0.2s;
+      font-size:1rem;
+    }
+
+    button:hover{
+      background:#005fd1;
+    }
+
+    .error{
+      color:red;
+      margin-bottom:10px;
+      text-align:center;
+    }
+
+    @media(max-width:600px){
+      h1{
+        font-size:1.5rem;
+      }
+
+      .messages{
+        height:300px;
+      }
+
+      .input-area{
+        flex-direction:column;
+      }
+
+      button{
+        width:100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-box" id="loginBox">
+    <h1>HAK-Sacre-coeur</h1>
+    <div class="error" id="error"></div>
+
+    <input type="email" id="email" placeholder="E-Mail">
+    <input type="password" id="password" placeholder="Passwort">
+
+    <button onclick="login()">
+      Anmelden / Registrieren
+    </button>
+  </div>
+
+  <div class="forum-box" id="forumBox">
+    <h1>HAK-Sacre-coeur</h1>
+    <div class="messages" id="messages"></div>
+
+    <div class="input-area">
+      <input type="text" id="messageInput" placeholder="Nachricht schreiben...">
+      <button onclick="sendMessage()">Senden</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, addDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    // FIREBASE CONFIG
+    const firebaseConfig = {
+      apiKey: "AIzaSyBiZgq5xE6CrOAKAYW0Jqj15UmL-r-RUgQ",
+      authDomain: "haksacrecoeur-42b36.firebaseapp.com",
+      projectId: "haksacrecoeur-42b36",
+      storageBucket: "haksacrecoeur-42b36.firebasestorage.app",
+      messagingSenderId: "393053212659",
+      appId: "1:393053212659:web:1a8d5033f60c57fb648c86",
+      measurementId: "G-K6Z46KENT8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DEINE ADMIN ID
+    const adminUid = "yY81pFPtCHfEzjUyA0bcVlhO0cv1";
+
+    // ERLAUBTE EMAILS
+    const allowedDomains = ["gmail.com", "outlook.com", "yahoo.com"];
+
+    // LOGIN / REGISTER
+    window.login = async function() {
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value.trim();
+      const error = document.getElementById("error");
+
+      error.textContent = "";
+      error.style.color = "red";
+
+      if (email === "" || password === "") {
+        error.textContent = "Bitte alles ausfüllen.";
+        return;
+      }
+
+      const domain = email.split("@")[1];
+      if (!allowedDomains.includes(domain)) {
+        error.textContent = "Nur Gmail, Outlook oder Yahoo erlaubt.";
+        return;
+      }
+
+      try {
+        // Erster Versuch: Login
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        
+        if (userDoc.exists() && userDoc.data().approved === true) {
+          showForum();
+        } else {
+          error.textContent = "Du wurdest noch nicht freigeschaltet.";
+        }
+
+      } catch (loginError) {
+        // Zweiter Versuch: Wenn Login scheitert (weil Account neu ist), registrieren
+        if (loginError.code === "auth/user-not-found" || loginError.code === "auth/invalid-credential") {
+          try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            await setDoc(doc(db, "users", user.uid), {
+              email: email,
+              approved: false
+            });
+
+            error.style.color = "green";
+            error.textContent = "Registriert. Warte auf Freischaltung.";
+          } catch (registerError) {
+            error.textContent = "Fehler: " + registerError.message;
+          }
+        } else {
+          error.textContent = "Fehler: " + loginError.message;
+        }
+      }
+    };
+
+    // FORUM ZEIGEN
+    function showForum() {
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("forumBox").style.display = "block";
+      loadMessages();
+    }
+
+    // NACHRICHTEN LADEN
+    async function loadMessages() {
+      const messagesContainer = document.getElementById("messages");
+      messagesContainer.innerHTML = "";
+
+      try {
+        const q = query(collection(db, "Nachrichten"), orderBy("timestamp"));
+        const querySnapshot = await getDocs(q);
+        const now = Date.now();
+
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+
+          // Älter als 48 Stunden im UI überspringen
+          const age = now - data.timestamp;
+          if (age > 48 * 60 * 60 * 1000) {
+            return;
+          }
+
+          const messageDiv = document.createElement("div");
+          messageDiv.classList.add("message");
+
+          const textSpan = document.createElement("span");
+
+          // ABFRAGE: Ist es der Admin oder ein anonymer User?
+          if (data.senderId === adminUid) {
+            textSpan.textContent = "Admin: " + data.text;
+            messageDiv.style.background = "#28a745"; // Grüner Kasten für dich als Admin
+          } else {
+            textSpan.textContent = "Anonym: " + data.text;
+          }
+
+          const timeSpan = document.createElement("span");
+          timeSpan.classList.add("time");
+          timeSpan.textContent = data.time;
+
+          messageDiv.appendChild(textSpan);
+          messageDiv.appendChild(timeSpan);
+          messagesContainer.appendChild(messageDiv);
+        });
+
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      } catch (err) {
+        console.error("Fehler beim Laden:", err);
+      }
+    }
+
+    // NACHRICHT SENDEN
+    window.sendMessage = async function() {
+      const input = document.getElementById("messageInput");
+      const text = input.value.trim();
+
+      if (text === "") return;
+
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+
+      try {
+        await addDoc(collection(db, "Nachrichten"), {
+          text: text,
+          time: `${hours}:${minutes}`,
+          timestamp: Date.now(),
+          senderId: currentUser.uid // Speichert die User-ID beim Senden mit ab
+        });
+
+        input.value = "";
+        loadMessages();
+      } catch (err) {
+        console.error("Fehler beim Senden:", err);
+      }
+    };
+
+    // ENTER SENDEN
+    document.getElementById("messageInput").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    });
+
+    // PRÜFEN OB BEREITS EINGELOGGT UND FREIGESCHALTET
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists() && userDoc.data().approved === true) {
+          showForum();
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
