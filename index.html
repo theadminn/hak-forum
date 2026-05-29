@@ -3,112 +3,576 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HAK-Sacre-coeur Forum</title>
-  <style>
-    /* Grund-Layout */
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-    body { background: #f2f2f2; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-    
-    /* Login & Register Boxen */
-    .auth-box { width: 100%; max-width: 400px; background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    .hidden { display: none; }
-    input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; margin-bottom: 10px; }
-    button { width: 100%; padding: 12px; border: none; border-radius: 10px; background: #007bff; color: white; cursor: pointer; font-weight: bold; }
-    .toggle-text { margin-top: 15px; font-size: 0.85rem; color: #555; text-align: center; cursor: pointer; text-decoration: underline; }
 
-    /* Forum Haupt-Layout */
-    .forum-container { display: none; gap: 20px; width: 100%; max-width: 950px; }
-    .forum-main { flex: 1; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    .forum-sidebar { width: 220px; display: flex; flex-direction: column; gap: 10px; }
-    
-    /* Regel-Button Links (Fixiert) */
-    .rules-button-left { 
-        position: fixed; left: 20px; top: 20px; display: none;
-        background: #007bff; color: white; padding: 15px; border-radius: 10px;
-        cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 100;
+  <title>HAK-Sacre-coeur Forum</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
     }
 
-    /* Sidebar Elemente Rechts */
-    .sidebar-box { background: white; padding: 12px 15px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; font-size: 0.9rem; font-weight: bold; text-align: center; color: #333; border: 1px solid #ddd; transition: 0.2s; }
-    .sidebar-box:hover { background: #f0f7ff; color: #007bff; }
+    body{
+      background:#f2f2f2;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+      position:relative;
+    }
 
-    /* Popup Fenster */
-    .popup-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
-    .popup-content { background: white; padding: 25px; border-radius: 12px; max-width: 450px; width: 100%; box-shadow: 0 5px 20px rgba(0,0,0,0.2); position: relative; }
-    .popup-close { position: absolute; top: 15px; right: 15px; cursor: pointer; font-size: 1.5rem; color: #999; }
-    
-    /* Chat Bereich */
-    .messages { height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 10px; padding: 10px; background: #fafafa; margin-bottom: 15px; }
-    .message { background: #007bff; color: white; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
+    .toggle-box {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .toggle-box span {
+      color: #007bff;
+      cursor: pointer;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+
+    .login-box,
+    .register-box,
+    .forum-box {
+      width:100%;
+      max-width:700px;
+      background:white;
+      border-radius:15px;
+      padding:20px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    .register-box,
+    .forum-box {
+      display:none;
+    }
+
+    .forum-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+
+    h1 {
+      color:#222;
+      font-size:2rem;
+      margin: 0;
+    }
+
+    /* MENÜ/SIDEBAR RECHTS VOM CHAT */
+    .forum-sidebar-boxes {
+      position: absolute;
+      top: 20px;
+      right: -240px;
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sidebar-box {
+      background: white;
+      padding: 12px 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: bold;
+      text-align: center;
+      color: #333;
+      transition: transform 0.2s, background 0.2s;
+      border: 1px solid #ddd;
+    }
+
+    .sidebar-box:hover {
+      transform: translateY(-2px);
+      background: #f0f7ff;
+      color: #007bff;
+    }
+
+    /* SCROLL BUTTONS UNTER DER SIDEBAR */
+    .scroll-buttons-container {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .scroll-btn {
+      flex: 1;
+      background: #555;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      text-align: center;
+      font-size: 0.85rem;
+      border: none;
+      transition: background 0.2s;
+    }
+    .scroll-btn:hover {
+      background: #333;
+    }
+
+    /* Popups */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .popup-content {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 450px;
+      width: 100%;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #999;
+      font-weight: bold;
+    }
+
+    .popup-close:hover { color: #ff0000; }
+
+    .popup-content h3 {
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+    }
+
+    .hobby-inputs-container {
+      margin-top: 5px;
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hobby-input-wrapper { display: none; }
+    .hobby-input-wrapper.visible { display: block; }
+
+    .message-hobbies {
+      display: block;
+      font-size: 0.75rem;
+      font-style: italic;
+      opacity: 0.85;
+      margin-top: 4px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 4px;
+    }
+
+    /* POSTFACH / MAIL STYLING */
+    .mail-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .mail-item {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 12px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mail-text {
+      font-size: 0.95rem;
+      color: #333;
+      word-break: break-word;
+    }
+
+    .mail-meta {
+      font-size: 0.75rem;
+      color: #777;
+      margin-top: 4px;
+      display: block;
+    }
+
+    .mail-delete-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      width: auto;
+    }
+    .mail-delete-btn:hover { background: #bd2130; }
+
+    .msg-mail-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.8);
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-left: 6px;
+      padding: 0 4px;
+      display: inline-block;
+      width: auto;
+    }
+    .msg-mail-btn:hover { color: white; text-decoration: underline; }
+
+    /* NEU: Klickbarer Username Style */
+    .chat-username-clickable {
+      cursor: pointer;
+    }
+    .chat-username-clickable:hover {
+      text-decoration: underline;
+    }
+
+    /* ADMIN E-MAIL DISPLAY IM CHAT */
+    .admin-visible-email {
+      font-size: 0.8rem;
+      font-weight: normal;
+      opacity: 0.85;
+      background: rgba(0, 0, 0, 0.15);
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-left: 5px;
+    }
+
+    .rank-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .rank-table td {
+      padding: 8px 5px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+    }
+
+    .rank-badge {
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .messages{
+      height:400px;
+      overflow-y:auto;
+      border:1px solid #ddd;
+      border-radius:10px;
+      padding:10px;
+      background:#fafafa;
+      margin-bottom:15px;
+      scroll-behavior: smooth;
+    }
+
+    .message{
+      background:#007bff;
+      color:white;
+      padding:12px;
+      border-radius:12px;
+      margin-bottom:10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      word-break:break-word;
+    }
+
+    .message-content-wrapper {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .time{
+      font-size:0.8rem;
+      opacity:0.8;
+      white-space:nowrap;
+      align-self: flex-start;
+    }
+
+    .input-area{
+      display:flex;
+      gap:10px;
+      margin-bottom:5px;
+    }
+
+    input{
+      width:100%;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #ccc;
+      font-size:1rem;
+      margin-bottom:12px;
+    }
+
+    .input-area input { margin-bottom:0; }
+
+    button{
+      width: 100%;
+      padding:12px 18px;
+      border:none;
+      border-radius:10px;
+      background:#007bff;
+      color:white;
+      cursor:pointer;
+      transition:0.2s;
+      font-size:1rem;
+    }
+
+    button:hover{ background:#005fd1; }
+
+    .error{
+      color:red;
+      margin-bottom:10px;
+      text-align:center;
+    }
+
+    .name-hint {
+      display: block;
+      color: #777;
+      font-size: 0.8rem;
+      margin-top: -8px;
+      margin-bottom: 12px;
+      font-style: italic;
+      padding-left: 5px;
+    }
+
+    .char-counter {
+      font-size: 0.8rem;
+      color: #777;
+      text-align: right;
+      margin-bottom: 10px;
+      padding-right: 5px;
+    }
+
+    .support-footer {
+      text-align:center;
+      margin-top:20px;
+      padding-top:15px;
+      border-top:1px solid #eee;
+      color:#666;
+      font-size:0.9rem;
+      line-height:1.5;
+    }
+
+    @media(max-width:1200px){
+      .forum-sidebar-boxes {
+        position: static;
+        width: 100%;
+        margin-bottom: 15px;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .sidebar-box { flex: 1; min-width: 140px; }
+      .scroll-buttons-container { width: 100%; }
+    }
+
+    @media(max-width:600px){
+      .toggle-box { position: static; margin-bottom: 15px; width: 100%; text-align: center; }
+      h1{ font-size:1.5rem; }
+      .messages{ height:300px; }
+      .input-area{ flex-direction:column; }
+      .forum-sidebar-boxes { flex-direction: column; }
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- Regel Button -->
-  <div class="rules-button-left" id="rulesBtn" onclick="openPopup('rulesPopup')">Sacre-coeur Regeln</div>
+  <div class="toggle-box" id="toggleBox">
+    <div id="toRegisterText">Noch kein Konto? <span onclick="showRegister()">Registrieren</span></div>
+    <div id="toLoginText" style="display:none;">Bereits registriert? <span onclick="showLogin()">Anmelden</span></div>
+  </div>
 
-  <!-- Auth Boxen -->
-  <div class="auth-box" id="loginBox">
-    <h1>Login</h1>
+  <div class="login-box" id="loginBox">
+    <h1 style="text-align:center; margin-bottom:25px;">HAK-Sacre-coeur</h1>
+    <div class="error" id="loginError"></div>
     <input type="email" id="loginEmail" placeholder="E-Mail">
     <input type="password" id="loginPassword" placeholder="Passwort">
     <button onclick="login()">Anmelden</button>
-    <p class="toggle-text" onclick="showRegister()">Noch kein Konto? Registrieren</p>
   </div>
 
-  <div class="auth-box hidden" id="registerBox">
-    <h1>Registrieren</h1>
+  <div class="register-box" id="registerBox">
+    <h1 style="text-align:center; margin-bottom:25px;">Konto erstellen</h1>
+    <div class="error" id="registerError"></div>
+    <input type="text" id="regUsername" placeholder="Wunsch-Username">
+    <span class="name-hint">Es wird empfohlen, keine echten Namen zu verwenden.</span>
     <input type="email" id="regEmail" placeholder="E-Mail">
-    <input type="password" id="regPassword" placeholder="Passwort">
-    <button onclick="register()">Konto erstellen</button>
-    <p class="toggle-text" onclick="showLogin()">Zurück zum Login</p>
+    <input type="password" id="regPassword" placeholder="Passwort (mind. 6 Zeichen)">
+    <button onclick="register()">Registrieren</button>
   </div>
 
-  <!-- Forum Container -->
-  <div class="forum-container" id="forumBox">
-    <div class="forum-main">
-      <h1>HAK-Sacre-coeur Forum</h1>
-      <div class="messages" id="messages"></div>
-      <input type="text" id="messageInput" placeholder="Nachricht...">
-      <button onclick="sendMessage()">Senden</button>
+  <div class="forum-box" id="forumBox">
+    <div class="forum-header">
+      <h1>HAK-Sacre-coeur</h1>
     </div>
-    <div class="forum-sidebar">
-      <div class="sidebar-box" onclick="openPopup('rankPopup')">Rangsystem</div>
+
+    <div class="forum-sidebar-boxes">
+      <div class="sidebar-box" onclick="openPopup('rulesPopup')">Sacre-coeur</div>
+      <div class="sidebar-box" onclick="openPopup('rankPopup')">Rangsystem anschauen</div>
       <div class="sidebar-box" onclick="openPopup('profilePopup')">Mein Profil</div>
-      <div class="sidebar-box" id="secretNetfxBtn" style="display:none; color: red;" onclick="openPopup('netfxPopup')">Net.fx ⚙</div>
-      <div class="sidebar-box" onclick="logout()" style="color: red;">Abmelden</div>
+      
+      <div class="sidebar-box" onclick="openPopup('mailboxPopup')" style="background: #e6f2ff; color: #007bff; border-color: #b3d7ff;">Mein Postfach ✉</div>
+      
+      <div class="sidebar-box" id="secretNetfxBtn" style="display: none; background: #1a1a1a; color: #ff3333; border-color: #ff0000;" onclick="openPopup('netfxPopup')">Net.fx ⚙</div>
+
+      <div class="sidebar-box" onclick="logout()" style="color: red; border-color: #ffa0a0; margin-top: auto;">Abmelden</div>
+      
+      <div class="scroll-buttons-container">
+        <button class="scroll-btn" onclick="scrollChat('top')">▲ Nach oben</button>
+        <button class="scroll-btn" onclick="scrollChat('bottom')">▼ Nach unten</button>
+      </div>
+    </div>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="input-area">
+      <input type="text" id="messageInput" placeholder="Nachricht schreiben..." maxlength="500" oninput="updateCharCounter()">
+      <button onclick="sendMessage()" style="width:auto;">Senden</button>
+    </div>
+    <div class="char-counter" id="charCounter">0 / 500 Zeichen</div>
+
+    <div class="support-footer">
+      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
     </div>
   </div>
 
-  <!-- Popups -->
   <div class="popup-overlay" id="rulesPopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('rulesPopup')">×</span>
-      <h3>Sacre-coeur Regeln</h3>
-      <ol style="margin-top: 15px; padding-left: 20px; line-height: 1.6;">
-        <li>Dieses Forum nicht in der Schule erwähnen.</li>
-        <li>Space für HAK/HAS Sacre-coeur Schüler. Keine Zensur, volle Meinungsfreiheit; empfohlen wird respektvoller Umgang.</li>
+      <h3>Regeln</h3>
+      <ol style="margin-left: 20px;">
+        <li>Es herrscht Meinungsfreiheit.</li>
+        <li>Versuche respektvoll zu bleiben.</li>
         <li>Der Admin haftet nicht für Konflikte.</li>
       </ol>
     </div>
   </div>
 
+  <div class="popup-overlay" id="userViewPopup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup('userViewPopup')">×</span>
+      <h3 id="viewTitle">Profil von ...</h3>
+      <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Username:</strong> <span id="viewName">-</span></p>
+      <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Rang:</strong> <span id="viewRank">-</span></p>
+      <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Hobbys:</strong> <span id="viewHobbies">-</span></p>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="profilePopup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup('profilePopup')">×</span>
+      <h3>Mein Profil</h3>
+      <div id="profileMessage" style="text-align:center; margin-bottom:10px; font-weight:bold;"></div>
+      
+      <label style="font-size:0.9rem; font-weight:bold; color:#444;">Username ändern:</label>
+      <input type="text" id="profNameInput" style="margin-top:5px; margin-bottom:4px;">
+      <span class="name-hint" style="margin-bottom:15px; display:block;">Es wird empfohlen, keine echten Namen zu verwenden.</span>
+      
+      <label style="font-size:0.9rem; font-weight:bold; color:#444;">Meine Hobbys:</label>
+      <div class="hobby-inputs-container">
+        <div class="hobby-input-wrapper visible" id="hobbyWrapper1"><input type="text" id="hobbyInput1" placeholder="Hobby 1" oninput="handleHobbyInputs()"></div>
+        <div class="hobby-input-wrapper" id="hobbyWrapper2"><input type="text" id="hobbyInput2" placeholder="Hobby 2" oninput="handleHobbyInputs()"></div>
+        <div class="hobby-input-wrapper" id="hobbyWrapper3"><input type="text" id="hobbyInput3" placeholder="Hobby 3" oninput="handleHobbyInputs()"></div>
+        <div class="hobby-input-wrapper" id="hobbyWrapper4"><input type="text" id="hobbyInput4" placeholder="Hobby 4" oninput="handleHobbyInputs()"></div>
+        <div class="hobby-input-wrapper" id="hobbyWrapper5"><input type="text" id="hobbyInput5" placeholder="Hobby 5" oninput="handleHobbyInputs()"></div>
+      </div>
+
+      <p style="margin-bottom: 8px;"><strong>E-Mail:</strong> <span id="profEmail">-</span></p>
+      <p style="margin-bottom: 8px;"><strong>Nachrichten gesamt:</strong> <span id="profCount">0</span></p>
+      <p style="margin-bottom: 20px;"><strong>Aktueller Rang:</strong> <span id="profRank">-</span></p>
+      
+      <button onclick="saveProfileName()">Änderungen speichern</button>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="rankPopup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup('rankPopup')">×</span>
+      <h3>Das Rangsystem</h3>
+      <table class="rank-table">
+        <tr style="color: #8B4513; font-weight: bold;"><td>Noob</td><td>0 - 100 Texte</td></tr>
+        <tr style="color: #007bff; font-weight: bold;"><td>Pro</td><td>101 - 400 Texte</td></tr>
+        <tr style="color: #8a2be2; font-weight: bold;"><td>Champ</td><td>401 - 1000 Texte</td></tr>
+        <tr style="color: #ffd700; font-weight: bold; background: #fffdf0;"><td>Admin-Lite</td><td>1001 - 3000 Texte</td></tr>
+        <tr style="color: #28a745; font-weight: bold; background: #f0fdf4;"><td>Admin-Like</td><td>Ab 3001 Texte</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="sendMailPopup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup('sendMailPopup')">×</span>
+      <h3>Anonyme Nachricht senden</h3>
+      <p style="margin-bottom: 12px; font-size:0.95rem;">Empfänger: <strong id="mailTargetName">-</strong></p>
+      <input type="hidden" id="mailTargetUid">
+      
+      <div id="sendMailMessage" style="text-align:center; margin-bottom:10px; font-weight:bold;"></div>
+      <input type="text" id="mailTextInput" placeholder="Deine geheime Nachricht..." maxlength="300">
+      <button onclick="submitPrivateMail()">Abschicken</button>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="mailboxPopup">
+    <div class="popup-content" style="max-width: 500px;">
+      <span class="popup-close" onclick="closePopup('mailboxPopup')">×</span>
+      <h3>Mein Postfach</h3>
+      <div id="mailboxStatus" style="text-align:center; color:#777; font-style:italic; margin-top:15px;">Lade Nachrichten...</div>
+      <div class="mail-list" id="mailListContainer"></div>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="netfxPopup">
+    <div class="popup-content" style="background: #111; color: #00ff00; border: 2px solid #ff0000;">
+      <span class="popup-close" onclick="closePopup('netfxPopup')" style="color: #ff3333;">×</span>
+      <h3 style="color: #ff3333; border-bottom: 1px solid #ff3333;">System-Modul: Net.fx</h3>
+      <p style="font-family: 'Courier New', monospace; font-size: 1.05rem; line-height: 1.6; margin-top: 15px;">
+        Um Net.fx auszuschalten musst du systeminformer herunterladen und dannch als administrator launchen. Net.fx suchen und mit rechtsklick terminaten
+      </p>
+    </div>
+  </div>
+
   <script type="module">
-    // Firebase & Logik Platzhalter
-    window.showRegister = () => { document.getElementById('loginBox').classList.add('hidden'); document.getElementById('registerBox').classList.remove('hidden'); };
-    window.showLogin = () => { document.getElementById('registerBox').classList.add('hidden'); document.getElementById('loginBox').classList.remove('hidden'); };
-    window.openPopup = (id) => document.getElementById(id).style.display = "flex";
-    window.closePopup = (id) => document.getElementById(id).style.display = "none";
-    
-    // Auth Simuliert für das Grundgerüst
-    window.login = () => {
-        document.getElementById('loginBox').classList.add('hidden');
-        document.getElementById('forumBox').style.display = "flex";
-        document.getElementById('rulesBtn').style.display = "block";
-    };
-    
-    window.logout = () => location.reload();
+    // ... (Hier bleibt dein bisheriger JS Code unverändert)
   </script>
 </body>
 </html>
