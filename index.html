@@ -2,54 +2,73 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HAK-Sacre-coeur Forum</title>
   <style>
-    *{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
-    body{ background:#f2f2f2; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px; }
+    /* Grund-Layout */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { background: #f2f2f2; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
     
-    .forum-container { display: flex; gap: 20px; width: 100%; max-width: 950px; }
+    /* Login & Register Boxen */
+    .auth-box { width: 100%; max-width: 400px; background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .hidden { display: none; }
+    input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; margin-bottom: 10px; }
+    button { width: 100%; padding: 12px; border: none; border-radius: 10px; background: #007bff; color: white; cursor: pointer; font-weight: bold; }
+    .toggle-text { margin-top: 15px; font-size: 0.85rem; color: #555; text-align: center; cursor: pointer; text-decoration: underline; }
+
+    /* Forum Haupt-Layout */
+    .forum-container { display: none; gap: 20px; width: 100%; max-width: 950px; }
     .forum-main { flex: 1; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
     .forum-sidebar { width: 220px; display: flex; flex-direction: column; gap: 10px; }
-
-    /* Regel-Button LINKS (Fixiert) */
+    
+    /* Regel-Button Links (Fixiert) */
     .rules-button-left { 
-        position: fixed; left: 20px; top: 20px;
+        position: fixed; left: 20px; top: 20px; display: none;
         background: #007bff; color: white; padding: 15px; border-radius: 10px;
-        cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 100;
     }
 
-    .sidebar-box { background: white; padding: 12px 15px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; font-weight: bold; text-align: center; border: 1px solid #ddd; }
+    /* Sidebar Elemente Rechts */
+    .sidebar-box { background: white; padding: 12px 15px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; font-size: 0.9rem; font-weight: bold; text-align: center; color: #333; border: 1px solid #ddd; transition: 0.2s; }
+    .sidebar-box:hover { background: #f0f7ff; color: #007bff; }
+
+    /* Popup Fenster */
+    .popup-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
+    .popup-content { background: white; padding: 25px; border-radius: 12px; max-width: 450px; width: 100%; box-shadow: 0 5px 20px rgba(0,0,0,0.2); position: relative; }
+    .popup-close { position: absolute; top: 15px; right: 15px; cursor: pointer; font-size: 1.5rem; color: #999; }
     
-    .login-box { width:100%; max-width:400px; background:white; border-radius:15px; padding:20px; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
-    
-    .popup-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 200; justify-content: center; align-items: center; }
-    .popup-content { background: white; padding: 25px; border-radius: 12px; max-width: 450px; position: relative; }
-    .popup-close { position: absolute; top: 10px; right: 10px; cursor: pointer; font-size: 1.5rem; }
-    
-    .messages{ height:400px; overflow-y:auto; border:1px solid #ddd; border-radius:10px; padding:10px; margin-bottom:15px; }
-    .message{ background:#007bff; color:white; padding:10px; border-radius:10px; margin-bottom:8px; }
-    input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 10px; margin-bottom: 10px; }
-    button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 10px; cursor: pointer; }
+    /* Chat Bereich */
+    .messages { height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 10px; padding: 10px; background: #fafafa; margin-bottom: 15px; }
+    .message { background: #007bff; color: white; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
   </style>
 </head>
 
 <body>
 
-  <!-- Regel-Button Links -->
-  <div class="rules-button-left" onclick="openPopup('rulesPopup')">Sacre-coeur Regeln</div>
+  <!-- Regel Button -->
+  <div class="rules-button-left" id="rulesBtn" onclick="openPopup('rulesPopup')">Sacre-coeur Regeln</div>
 
-  <!-- Login -->
-  <div class="login-box" id="loginBox">
-    <h1>HAK-Sacre-coeur</h1>
+  <!-- Auth Boxen -->
+  <div class="auth-box" id="loginBox">
+    <h1>Login</h1>
     <input type="email" id="loginEmail" placeholder="E-Mail">
     <input type="password" id="loginPassword" placeholder="Passwort">
     <button onclick="login()">Anmelden</button>
+    <p class="toggle-text" onclick="showRegister()">Noch kein Konto? Registrieren</p>
   </div>
 
-  <!-- Forum -->
-  <div class="forum-container" id="forumBox" style="display:none;">
+  <div class="auth-box hidden" id="registerBox">
+    <h1>Registrieren</h1>
+    <input type="email" id="regEmail" placeholder="E-Mail">
+    <input type="password" id="regPassword" placeholder="Passwort">
+    <button onclick="register()">Konto erstellen</button>
+    <p class="toggle-text" onclick="showLogin()">Zurück zum Login</p>
+  </div>
+
+  <!-- Forum Container -->
+  <div class="forum-container" id="forumBox">
     <div class="forum-main">
-      <h1>Forum</h1>
+      <h1>HAK-Sacre-coeur Forum</h1>
       <div class="messages" id="messages"></div>
       <input type="text" id="messageInput" placeholder="Nachricht...">
       <button onclick="sendMessage()">Senden</button>
@@ -67,7 +86,7 @@
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('rulesPopup')">×</span>
       <h3>Sacre-coeur Regeln</h3>
-      <ol style="margin-top:15px; padding-left:20px;">
+      <ol style="margin-top: 15px; padding-left: 20px; line-height: 1.6;">
         <li>Dieses Forum nicht in der Schule erwähnen.</li>
         <li>Space für HAK/HAS Sacre-coeur Schüler. Keine Zensur, volle Meinungsfreiheit; empfohlen wird respektvoller Umgang.</li>
         <li>Der Admin haftet nicht für Konflikte.</li>
@@ -76,35 +95,20 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-    import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-    const firebaseConfig = { /* Deine Firebase Daten hier */ };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
+    // Firebase & Logik Platzhalter
+    window.showRegister = () => { document.getElementById('loginBox').classList.add('hidden'); document.getElementById('registerBox').classList.remove('hidden'); };
+    window.showLogin = () => { document.getElementById('registerBox').classList.add('hidden'); document.getElementById('loginBox').classList.remove('hidden'); };
     window.openPopup = (id) => document.getElementById(id).style.display = "flex";
     window.closePopup = (id) => document.getElementById(id).style.display = "none";
     
-    // Login & Auth Logik
+    // Auth Simuliert für das Grundgerüst
     window.login = () => {
-        const email = document.getElementById("loginEmail").value;
-        const pass = document.getElementById("loginPassword").value;
-        signInWithEmailAndPassword(auth, email, pass).catch(e => alert("Anmeldung fehlgeschlagen"));
+        document.getElementById('loginBox').classList.add('hidden');
+        document.getElementById('forumBox').style.display = "flex";
+        document.getElementById('rulesBtn').style.display = "block";
     };
-
-    window.logout = () => signOut(auth).then(() => location.reload());
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("forumBox").style.display = "flex";
-      }
-    });
-
-    // Hier würde die Nachrichten-Logik und die Net.fx Bedingung folgen...
+    
+    window.logout = () => location.reload();
   </script>
 </body>
 </html>
