@@ -25,7 +25,6 @@
       position:relative;
     }
 
-    /* Box oben rechts NUR für den Wechsel im Login-Bereich */
     .toggle-box {
       position: absolute;
       top: 20px;
@@ -62,7 +61,6 @@
       display:none;
     }
 
-    /* Header im Forum */
     .forum-header {
       display: flex;
       justify-content: space-between;
@@ -78,7 +76,7 @@
       margin: 0;
     }
 
-    /* Die zwei Boxen oben rechts IM CHAT */
+    /* MENÜ/SIDEBAR RECHTS VOM CHAT */
     .forum-sidebar-boxes {
       position: absolute;
       top: 20px;
@@ -109,7 +107,30 @@
       color: #007bff;
     }
 
-    /* Overlays / Popups für Profil & Ränge */
+    /* SCROLL BUTTONS UNTER DER SIDEBAR */
+    .scroll-buttons-container {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .scroll-btn {
+      flex: 1;
+      background: #555;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      text-align: center;
+      font-size: 0.85rem;
+      border: none;
+      transition: background 0.2s;
+    }
+    .scroll-btn:hover {
+      background: #333;
+    }
+
+    /* Popups */
     .popup-overlay {
       display: none;
       position: fixed;
@@ -131,7 +152,6 @@
       position: relative;
     }
 
-    /* Das X oben rechts im Fenster */
     .popup-close {
       position: absolute;
       top: 15px;
@@ -140,12 +160,9 @@
       cursor: pointer;
       color: #999;
       font-weight: bold;
-      transition: color 0.2s;
     }
 
-    .popup-close:hover {
-      color: #ff0000;
-    }
+    .popup-close:hover { color: #ff0000; }
 
     .popup-content h3 {
       margin-bottom: 15px;
@@ -154,7 +171,6 @@
       padding-bottom: 8px;
     }
 
-    /* Rangliste Tabelle */
     .rank-table {
       width: 100%;
       border-collapse: collapse;
@@ -167,7 +183,6 @@
       font-size: 0.95rem;
     }
 
-    /* Badge-Styling im Chat */
     .rank-badge {
       font-size: 0.75rem;
       font-weight: bold;
@@ -186,6 +201,7 @@
       padding:10px;
       background:#fafafa;
       margin-bottom:15px;
+      scroll-behavior: smooth;
     }
 
     .message{
@@ -210,7 +226,7 @@
     .input-area{
       display:flex;
       gap:10px;
-      margin-bottom:15px;
+      margin-bottom:5px;
     }
 
     input{
@@ -222,9 +238,7 @@
       margin-bottom:12px;
     }
 
-    .input-area input {
-      margin-bottom:0;
-    }
+    .input-area input { margin-bottom:0; }
 
     button{
       width: 100%;
@@ -238,9 +252,7 @@
       font-size:1rem;
     }
 
-    button:hover{
-      background:#005fd1;
-    }
+    button:hover{ background:#005fd1; }
 
     .error{
       color:red;
@@ -258,6 +270,15 @@
       padding-left: 5px;
     }
 
+    /* Zeichenzähler unter dem Input */
+    .char-counter {
+      font-size: 0.8rem;
+      color: #777;
+      text-align: right;
+      margin-bottom: 10px;
+      padding-right: 5px;
+    }
+
     .support-footer {
       text-align:center;
       margin-top:20px;
@@ -266,46 +287,24 @@
       color:#666;
       font-size:0.9rem;
       line-height:1.5;
-      word-break:break-word;
     }
 
-    .support-footer a {
-      color:#007bff;
-      text-decoration:none;
-    }
+    .support-footer a { color:#007bff; text-decoration:none; }
 
-    .support-footer a:hover {
-      text-decoration:underline;
-    }
-
-    .reload-hint {
-      display:block;
-      margin-top:5px;
-      color:#888;
-      font-size:0.8rem;
-      font-style:italic;
-    }
-
-    /* Handy-Optimierung für die seitlichen Boxen */
     @media(max-width:1200px){
       .forum-sidebar-boxes {
         position: static;
         width: 100%;
         margin-bottom: 15px;
         flex-direction: row;
+        flex-wrap: wrap;
       }
-      .sidebar-box {
-        flex: 1;
-      }
+      .sidebar-box { flex: 1; min-width: 140px; }
+      .scroll-buttons-container { width: 100%; }
     }
 
     @media(max-width:600px){
-      .toggle-box {
-        position: static;
-        margin-bottom: 15px;
-        width: 100%;
-        text-align: center;
-      }
+      .toggle-box { position: static; margin-bottom: 15px; width: 100%; text-align: center; }
       h1{ font-size:1.5rem; }
       .messages{ height:300px; }
       .input-area{ flex-direction:column; }
@@ -324,33 +323,19 @@
   <div class="login-box" id="loginBox">
     <h1 style="text-align:center; margin-bottom:25px;">HAK-Sacre-coeur</h1>
     <div class="error" id="loginError"></div>
-
     <input type="email" id="loginEmail" placeholder="E-Mail">
     <input type="password" id="loginPassword" placeholder="Passwort">
-
     <button onclick="login()">Anmelden</button>
-
-    <div class="support-footer">
-      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
-      <span class="reload-hint">Falls neue Nachrichten nicht geladen werden, bitte die Seite neu laden.</span>
-    </div>
   </div>
 
   <div class="register-box" id="registerBox">
     <h1 style="text-align:center; margin-bottom:25px;">Konto erstellen</h1>
     <div class="error" id="registerError"></div>
-
     <input type="text" id="regUsername" placeholder="Wunsch-Username">
     <span class="name-hint">Es wird empfohlen, keine echten Namen zu verwenden.</span>
-
     <input type="email" id="regEmail" placeholder="E-Mail">
     <input type="password" id="regPassword" placeholder="Passwort (mind. 6 Zeichen)">
-
     <button onclick="register()">Registrieren</button>
-
-    <div class="support-footer">
-      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
-    </div>
   </div>
 
   <div class="forum-box" id="forumBox">
@@ -361,19 +346,27 @@
     <div class="forum-sidebar-boxes">
       <div class="sidebar-box" onclick="openPopup('rankPopup')">Rangsystem anschauen</div>
       <div class="sidebar-box" onclick="openPopup('profilePopup')">Mein Profil</div>
-      <div class="sidebar-box" onclick="logout()" style="color: red; border-color: #ffa0a0;">Abmelden</div>
+      
+      <div class="sidebar-box" id="adminClearBtn" style="display: none; color: white; background: #dc3545; border-color: #bd2130;" onclick="clearChatHistory()">Chatverlauf leeren</div>
+      
+      <div class="sidebar-box" onclick="logout()" style="color: red; border-color: #ffa0a0; margin-top: auto;">Abmelden</div>
+      
+      <div class="scroll-buttons-container">
+        <button class="scroll-btn" onclick="scrollChat('top')">▲ Nach oben</button>
+        <button class="scroll-btn" onclick="scrollChat('bottom')">▼ Nach unten</button>
+      </div>
     </div>
 
     <div class="messages" id="messages"></div>
 
     <div class="input-area">
-      <input type="text" id="messageInput" placeholder="Nachricht schreiben...">
+      <input type="text" id="messageInput" placeholder="Nachricht schreiben..." maxlength="500" oninput="updateCharCounter()">
       <button onclick="sendMessage()" style="width:auto;">Senden</button>
     </div>
+    <div class="char-counter" id="charCounter">0 / 500 Zeichen</div>
 
     <div class="support-footer">
       Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
-      <span class="reload-hint">Falls neue Nachrichten nicht geladen werden, bitte die Seite neu laden.</span>
     </div>
   </div>
 
@@ -399,7 +392,6 @@
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('rankPopup')">×</span>
       <h3>Das Rangsystem</h3>
-      <p style="font-size: 0.9rem; color: #555; margin-bottom: 10px;">Erreichte Meilensteine schalten automatisch neue Ränge und Chat-Farben frei:</p>
       <table class="rank-table">
         <tr style="color: #8B4513; font-weight: bold;"><td>Noob</td><td>0 - 100 Texte</td></tr>
         <tr style="color: #007bff; font-weight: bold;"><td>Pro</td><td>101 - 400 Texte</td></tr>
@@ -412,11 +404,9 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    // browserSessionPersistence importiert, um dauerhaften Login zu verhindern
     import { getAuth, setPersistence, browserSessionPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, addDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, addDoc, collection, getDocs, query, orderBy, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-    // FIREBASE CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyBiZgq5xE6CrOAKAYW0Jqj15UmL-r-RUgQ",
       authDomain: "haksacrecoeur-42b36.firebaseapp.com",
@@ -433,24 +423,29 @@
 
     const adminUid = "yY81pFPtCHfEzjUyA0bcVlhO0cv1";
     const allowedDomains = ["gmail.com", "outlook.com", "yahoo.com"];
-    
     const userCache = {};
+    let unsubscribeMessages = null;
 
-    // POPUP STEUERUNG
     window.openPopup = function(id) {
       document.getElementById(id).style.display = "flex";
       if(id === 'profilePopup') { loadProfileData(); }
     }
 
-    window.closePopup = function(id) {
-      document.getElementById(id).style.display = "none";
+    window.closePopup = function(id) { document.getElementById(id).style.display = "none"; }
+
+    window.updateCharCounter = function() {
+      const len = document.getElementById("messageInput").value.length;
+      document.getElementById("charCounter").textContent = `${len} / 500 Zeichen`;
     }
 
-    // Rangrechner anhand der Nachrichtenanzahl
+    window.scrollChat = function(direction) {
+      const container = document.getElementById("messages");
+      if(direction === 'top') { container.scrollTop = 0; }
+      else { container.scrollTop = container.scrollHeight; }
+    }
+
     function getRankInfo(msgCount, uid) {
-      if (uid === adminUid) {
-        return { name: "Admin", color: "#28a745" };
-      }
+      if (uid === adminUid) return { name: "Admin", color: "#28a745" };
       if (msgCount <= 100) return { name: "Noob", color: "#8B4513" };
       if (msgCount <= 400) return { name: "Pro", color: "#007bff" };
       if (msgCount <= 1000) return { name: "Champ", color: "#8a2be2" };
@@ -458,7 +453,6 @@
       return { name: "Admin-Like", color: "#28a745" };
     }
 
-    // Profildaten im Popup laden
     async function loadProfileData() {
       const u = auth.currentUser;
       if(!u) return;
@@ -474,39 +468,26 @@
         document.getElementById("profCount").textContent = count;
         document.getElementById("profRank").textContent = r.name;
         document.getElementById("profRank").style.color = r.color;
-        document.getElementById("profRank").style.fontWeight = "bold";
       }
     }
 
-    // USERNAME IN FIREBASE SPEICHERN
     window.saveProfileName = async function() {
       const u = auth.currentUser;
       if(!u) return;
-      
       const newName = document.getElementById("profNameInput").value.trim();
       const msgBox = document.getElementById("profileMessage");
       
       if(newName === "") {
-        msgBox.style.color = "red";
-        msgBox.textContent = "Name darf nicht leer sein!";
-        return;
+        msgBox.style.color = "red"; msgBox.textContent = "Name darf nicht leer sein!"; return;
       }
-      
       try {
-        await updateDoc(doc(db, "users", u.uid), {
-          username: newName
-        });
-        msgBox.style.color = "green";
-        msgBox.textContent = "Username erfolgreich aktualisiert!";
-        
-        loadMessages();
+        await updateDoc(doc(db, "users", u.uid), { username: newName });
+        msgBox.style.color = "green"; msgBox.textContent = "Username aktualisiert!";
       } catch(err) {
-        msgBox.style.color = "red";
-        msgBox.textContent = "Fehler beim Speichern.";
+        msgBox.style.color = "red"; msgBox.textContent = "Fehler beim Speichern.";
       }
     }
 
-    // LOGIN / REGISTER WECHSEL
     window.showRegister = function() {
       document.getElementById("loginBox").style.display = "none";
       document.getElementById("registerBox").style.display = "block";
@@ -521,95 +502,64 @@
       document.getElementById("toLoginText").style.display = "none";
     }
 
-    // LOGIN (Mit erzwungener Session-Persistenz)
     window.login = async function() {
       const email = document.getElementById("loginEmail").value.trim().toLowerCase();
       const password = document.getElementById("loginPassword").value.trim();
       const error = document.getElementById("loginError");
       error.textContent = "";
 
-      if (email === "" || password === "") {
-        error.textContent = "Bitte E-Mail und Passwort ausfüllen.";
-        return;
-      }
+      if (email === "" || password === "") { error.textContent = "Bitte Felder ausfüllen."; return; }
 
       try {
-        // Ändert die Persistenz, sodass der User beim Schließen des Tabs ausgeloggt wird
         await setPersistence(auth, browserSessionPersistence);
-        
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         const userDoc = await getDoc(doc(db, "users", user.uid));
         
-        if (userDoc.exists() && userDoc.data().approved === true) {
-          showForum();
-        } else {
-          error.textContent = "Du wurdest noch nicht freigeschaltet.";
-          await auth.signOut();
-        }
-      } catch (loginError) {
-        error.textContent = "Anmeldedaten falsch oder Account existiert nicht.";
-      }
+        if (userDoc.exists() && userDoc.data().approved === true) { showForum(); } 
+        else { error.textContent = "Du wurdest noch nicht freigeschaltet."; await auth.signOut(); }
+      } catch (loginError) { error.textContent = "Anmeldedaten falsch."; }
     };
 
-    // REGISTRIERUNG
     window.register = async function() {
       const usernameInput = document.getElementById("regUsername").value.trim();
       const email = document.getElementById("regEmail").value.trim().toLowerCase();
       const password = document.getElementById("regPassword").value.trim();
       const error = document.getElementById("registerError");
+      error.textContent = ""; error.style.color = "red";
 
-      error.textContent = "";
-      error.style.color = "red";
-
-      if (usernameInput === "" || email === "" || password === "") {
-        error.textContent = "Bitte alle Felder vollständig ausfüllen.";
-        return;
-      }
-
-      if (password.length < 6) {
-        error.textContent = "Das Passwort muss mindestens 6 Zeichen lang sein.";
-        return;
-      }
+      if (usernameInput === "" || email === "" || password === "") { error.textContent = "Bitte alle Felder ausfüllen."; return; }
+      if (password.length < 6) { error.textContent = "Passwort zu kurz."; return; }
 
       const domain = email.split("@")[1];
-      if (!allowedDomains.includes(domain)) {
-        error.textContent = "Nur Gmail, Outlook oder Yahoo erlaubt.";
-        return;
-      }
+      if (!allowedDomains.includes(domain)) { error.textContent = "Nur Gmail, Outlook oder Yahoo erlaubt."; return; }
 
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        await setDoc(doc(db, "users", user.uid), {
-          username: usernameInput,
-          email: email,
-          approved: false,
-          msgCount: 0 
-        });
-
-        error.style.color = "green";
-        error.textContent = "Registriert! Warte jetzt auf deine Freischaltung durch den Admin.";
-        
-        document.getElementById("regUsername").value = "";
-        document.getElementById("regEmail").value = "";
-        document.getElementById("regPassword").value = "";
-        
+        await setDoc(doc(db, "users", userCredential.user.uid), { username: usernameInput, email: email, approved: false, msgCount: 0 });
+        error.style.color = "green"; error.textContent = "Registriert! Warte auf Freischaltung.";
         setTimeout(showLogin, 3000);
-      } catch (registerError) {
-        if (registerError.code === "auth/email-already-in-use") {
-          error.textContent = "Diese E-Mail-Adresse wird bereits verwendet.";
-        } else {
-          error.textContent = "Fehler: " + registerError.message;
-        }
-      }
+      } catch (err) { error.textContent = "Fehler bei Registrierung."; }
     };
 
-    // LOGOUT
     window.logout = async function() {
+      if(unsubscribeMessages) unsubscribeMessages();
       await signOut(auth);
       location.reload();
+    }
+
+    // ADMIN FUNKTION: VERLAUF LÖSCHEN
+    window.clearChatHistory = async function() {
+      if (auth.currentUser && auth.currentUser.uid === adminUid) {
+        if(confirm("Möchtest du wirklich alle Nachrichten im Chat unwiderruflich löschen?")) {
+          try {
+            const qSnap = await getDocs(collection(db, "Nachrichten"));
+            const batch = writeBatch(db);
+            qSnap.forEach((doc) => { batch.delete(doc.ref); });
+            await batch.commit();
+          } catch(err) { console.error("Fehler beim Löschen:", err); }
+        }
+      }
     }
 
     function showForum() {
@@ -617,42 +567,35 @@
       document.getElementById("registerBox").style.display = "none";
       document.getElementById("toggleBox").style.display = "none";
       document.getElementById("forumBox").style.display = "block";
-      loadMessages();
+      
+      if(auth.currentUser.uid === adminUid) {
+        document.getElementById("adminClearBtn").style.display = "block";
+      }
+      listenToMessagesLive();
     }
 
-    // MESSAGES LADEN
-    async function loadMessages() {
+    // LIVE INTERN: Echtzeit-Aktualisierung mit onSnapshot
+    function listenToMessagesLive() {
       const messagesContainer = document.getElementById("messages");
-      messagesContainer.innerHTML = "";
+      const q = query(collection(db, "Nachrichten"), orderBy("timestamp"));
 
-      try {
-        const currentUser = auth.currentUser;
-        const isCurrentAdmin = (currentUser && currentUser.uid === adminUid);
-
-        const q = query(collection(db, "Nachrichten"), orderBy("timestamp"));
-        const querySnapshot = await getDocs(q);
-
+      unsubscribeMessages = onSnapshot(q, async (snapshot) => {
+        messagesContainer.innerHTML = "";
+        
         const usersSnapshot = await getDocs(collection(db, "users"));
         usersSnapshot.forEach((userDoc) => {
           const userData = userDoc.data();
-          userCache[userDoc.id] = {
-            username: userData.username || "Anonym",
-            email: userData.email || "" ,
-            msgCount: userData.msgCount || 0
-          };
+          userCache[userDoc.id] = { username: userData.username || "Anonym", email: userData.email || "", msgCount: userData.msgCount || 0 };
         });
 
-        querySnapshot.forEach((docSnap) => {
+        snapshot.forEach((docSnap) => {
           const data = docSnap.data();
-
           const messageDiv = document.createElement("div");
           messageDiv.classList.add("message");
 
           const textSpan = document.createElement("span");
-
           const cachedUser = userCache[data.senderId];
           const displayUsername = cachedUser ? cachedUser.username : "Anonym";
-          const displayEmail = cachedUser ? cachedUser.email : "";
           const count = cachedUser ? cachedUser.msgCount : 0;
 
           const rank = getRankInfo(count, data.senderId);
@@ -663,11 +606,7 @@
           if (data.senderId === adminUid) {
             textSpan.innerHTML = `<strong>Admin ${badgeHTML}:</strong> ${data.text}`;
           } else {
-            if (isCurrentAdmin && displayEmail !== "") {
-              textSpan.innerHTML = `<strong>${displayUsername}</strong> (${displayEmail}) ${badgeHTML}: ${data.text}`;
-            } else {
-              textSpan.innerHTML = `<strong>${displayUsername}</strong> ${badgeHTML}: ${data.text}`;
-            }
+            textSpan.innerHTML = `<strong>${displayUsername}</strong> ${badgeHTML}: ${data.text}`;
           }
 
           const timeSpan = document.createElement("span");
@@ -678,19 +617,14 @@
           messageDiv.appendChild(timeSpan);
           messagesContainer.appendChild(messageDiv);
         });
-
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      } catch (err) {
-        console.error("Fehler beim Laden:", err);
-      }
+      });
     }
 
-    // MESSAGES SENDEN
     window.sendMessage = async function() {
       const input = document.getElementById("messageInput");
       const text = input.value.trim();
-
-      if (text === "") return;
+      if (text === "" || text.length > 500) return;
 
       const currentUser = auth.currentUser;
       if (!currentUser) return;
@@ -700,42 +634,24 @@
       const minutes = String(now.getMinutes()).padStart(2, "0");
 
       try {
-        await addDoc(collection(db, "Nachrichten"), {
-          text: text,
-          time: `${hours}:${minutes}`,
-          timestamp: Date.now(),
-          senderId: currentUser.uid
-        });
-
-        await updateDoc(doc(db, "users", currentUser.uid), {
-          msgCount: increment(1)
-        });
-
+        await addDoc(collection(db, "Nachrichten"), { text: text, time: `${hours}:${minutes}`, timestamp: Date.now(), senderId: currentUser.uid });
+        await updateDoc(doc(db, "users", currentUser.uid), { msgCount: increment(1) });
         input.value = "";
-        loadMessages();
-      } catch (err) {
-        console.error("Fehler beim Senden:", err);
-      }
+        updateCharCounter();
+      } catch (err) { console.error("Fehler beim Senden:", err); }
     };
 
     document.getElementById("messageInput").addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        sendMessage();
-      }
+      if (event.key === "Enter") sendMessage();
     });
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists() && userDoc.data().approved === true) {
-          showForum();
-        } else {
-          document.getElementById("loginBox").style.display = "block";
-          document.getElementById("registerBox").style.display = "none";
-        }
+        if (userDoc.exists() && userDoc.data().approved === true) { showForum(); } 
+        else { document.getElementById("loginBox").style.display = "block"; }
       }
     });
   </script>
-
 </body>
 </html>
