@@ -183,7 +183,6 @@
       gap: 10px;
       margin-top: 5px;
     }
-    /* ---------------------------- */
 
     /* MENÜ/SIDEBAR RECHTS VOM CHAT */
     .forum-sidebar-boxes {
@@ -287,6 +286,26 @@
       padding-bottom: 8px;
     }
 
+    /* Profile Avatar-Bilder */
+    .profile-avatar-display {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 15px auto;
+      border: 2px solid var(--border-color);
+    }
+
+    .chat-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      flex-shrink: 0;
+    }
+
     /* Regeln Liste Styling */
     .rules-list {
       list-style-type: none;
@@ -310,6 +329,32 @@
       position: absolute;
       left: 5px;
       top: -4px;
+    }
+
+    /* NEU: TRADITIONELLE REGELN IM LOGIN-FENSTER */
+    .auth-rules-container {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid var(--border-light);
+      text-align: left;
+    }
+
+    .auth-rules-notice {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--text-color);
+      margin-bottom: 8px;
+    }
+
+    .auth-rules-list {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding-left: 20px;
+      line-height: 1.5;
+    }
+
+    .auth-rules-list li {
+      margin-bottom: 4px;
     }
 
     .hobby-inputs-container {
@@ -557,7 +602,7 @@
       display:flex;
       justify-content:space-between;
       align-items:center;
-      gap:10px;
+      gap:12px;
       word-break:break-word;
     }
 
@@ -681,7 +726,6 @@
 
 <body>
 
-  <!-- KONTROLL-BOXEN OBEN RECHTS (THEME TOGGLE + LOGIN SWITCH) -->
   <div class="top-controls">
     <div class="toggle-box" id="toggleBox">
       <div id="toRegisterText">Noch kein Konto? <span onclick="showRegister()">Registrieren</span></div>
@@ -699,6 +743,15 @@
     <div class="auth-footer-note">
       Passwort vergessen? Schreiben Sie eine E-Mail an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a>
     </div>
+    
+    <div class="auth-rules-container">
+      <div class="auth-rules-notice">Wer einen Account gründet oder sich anmeldet, akzeptiert die Regeln:</div>
+      <ol class="auth-rules-list">
+        <li>Jeder ist gleich</li>
+        <li>Versuchen respektvoll zu bleiben</li>
+        <li>Admin haftet für nichts</li>
+      </ol>
+    </div>
   </div>
 
   <div class="register-box" id="registerBox">
@@ -712,6 +765,15 @@
     <div class="auth-footer-note">
       Passwort vergessen? Schreiben Sie eine E-Mail an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a>
     </div>
+
+    <div class="auth-rules-container">
+      <div class="auth-rules-notice">Wer einen Account gründet oder sich anmeldet, akzeptiert die Regeln:</div>
+      <ol class="auth-rules-list">
+        <li>Jeder ist gleich</li>
+        <li>Versuchen respektvoll zu bleiben</li>
+        <li>Admin haftet für nichts</li>
+      </ol>
+    </div>
   </div>
 
   <div class="forum-box" id="forumBox">
@@ -720,19 +782,16 @@
       <h1>HAK-Sacre-coeur</h1>
     </div>
 
-    <!-- LIVE NEWS SECTION OBEN -->
     <div class="news-container" id="newsSection">
       <div class="news-header-title">🚨 WICHTIGE NEWS & ANKÜNDIGUNGEN:</div>
       <div class="news-text-display" id="newsTextDisplay">Lade aktuelle News...</div>
       
-      <!-- Steuerelemente für den Admin -->
       <div class="news-admin-control" id="newsAdminControl" style="display: none;">
         <input type="text" id="newsInput" placeholder="Neue Ankündigung schreiben..." style="margin-bottom:0;">
         <button onclick="submitNews()" style="width:auto; background:#c53030;">Aktualisieren</button>
       </div>
     </div>
 
-    <!-- SIDEBAR RECHTS -->
     <div class="forum-sidebar-boxes">
       <div class="sidebar-box" style="background: #eef2f7; border-color: #d0dbe5; color: #2c3e50;" onclick="openPopup('standPopup')">Für was ich stehe</div>
       <div class="sidebar-box" style="background: #fff9e6; border-color: #ffe0b3; color: #333;" onclick="openPopup('rulesPopup')">Regeln</div>
@@ -758,7 +817,6 @@
     <div class="char-counter" id="charCounter">0 / 500 Zeichen</div>
   </div>
 
-  <!-- POPUPS -->
   <div class="popup-overlay" id="standPopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('standPopup')">×</span>
@@ -779,11 +837,11 @@
     </div>
   </div>
 
-  <!-- POPUP: FREMDE PROFILE ANZEIGEN -->
   <div class="popup-overlay" id="userViewPopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('userViewPopup')">×</span>
       <h3 id="viewTitle">Profil von ...</h3>
+      <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" id="viewAvatar" class="profile-avatar-display" alt="Avatar">
       <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Username:</strong> <span id="viewName">-</span></p>
       <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Dabei seit:</strong> <span id="viewCreated">-</span></p>
       <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Rang:</strong> <span id="viewRank">-</span></p>
@@ -792,16 +850,20 @@
     </div>
   </div>
 
-  <!-- POPUP: MEIN PROFIL -->
   <div class="popup-overlay" id="profilePopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('profilePopup')">×</span>
       <h3>Mein Profil</h3>
       <div id="profileMessage" style="text-align:center; margin-bottom:10px; font-weight:bold;"></div>
       
+      <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" id="profAvatarPreview" class="profile-avatar-display" alt="Vorschau">
+
       <label style="font-size:0.9rem; font-weight:bold;">Username ändern:</label>
       <input type="text" id="profNameInput" style="margin-top:5px; margin-bottom:4px;">
       <span class="name-hint" style="margin-bottom:15px; display:block;">Es wird empfohlen, keine echten Namen zu verwenden.</span>
+
+      <label style="font-size:0.9rem; font-weight:bold;">Profilbild-URL:</label>
+      <input type="text" id="profAvatarInput" placeholder="https://beispiel.com/dein-bild.jpg" style="margin-top:5px; margin-bottom:15px;">
 
       <label style="font-size:0.9rem; font-weight:bold;">Biografie (Bio) ändern:</label>
       <textarea id="profBioInput" placeholder="Erzähle etwas über dich (max. 150 Zeichen)..." maxlength="150" style="margin-top:5px; margin-bottom:15px;"></textarea>
@@ -922,6 +984,7 @@
 
     const adminUid = "yY81pFPtCHfEzjUyA0bcVlhO0cv1";
     const allowedDomains = ["gmail.com", "outlook.com", "yahoo.com"];
+    const defaultAvatarUrl = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
     
     const userCache = {};
     const adminMailCache = {};
@@ -1004,6 +1067,7 @@
       document.getElementById("viewName").textContent = cachedUser.username;
       document.getElementById("viewCreated").textContent = cachedUser.registriertAm || "Schulprojekt-Start";
       document.getElementById("viewBio").textContent = cachedUser.bio || "Keine Biografie ausgefüllt.";
+      document.getElementById("viewAvatar").src = cachedUser.avatarUrl || defaultAvatarUrl;
       
       const rankSpan = document.getElementById("viewRank");
       rankSpan.textContent = rank.name;
@@ -1402,11 +1466,14 @@
         const r = getRankInfo(count, u.uid, hasMailsWithAdmin);
         
         document.getElementById("profNameInput").value = d.username || "Anonym";
+        document.getElementById("profAvatarInput").value = d.avatarUrl || "";
         document.getElementById("profBioInput").value = d.bio || "";
         document.getElementById("profEmail").textContent = d.email || "";
         document.getElementById("profCreated").textContent = d.registriertAm || "Schulprojekt-Start";
         document.getElementById("profCount").textContent = count;
         
+        document.getElementById("profAvatarPreview").src = d.avatarUrl || defaultAvatarUrl;
+
         document.getElementById("profRank").textContent = r.name;
         document.getElementById("profRank").style.color = r.color;
 
@@ -1423,6 +1490,7 @@
       const u = auth.currentUser;
       if(!u) return;
       const newName = document.getElementById("profNameInput").value.trim();
+      const newAvatar = document.getElementById("profAvatarInput").value.trim();
       const newBio = document.getElementById("profBioInput").value.trim();
       const msgBox = document.getElementById("profileMessage");
       if(newName === "") { msgBox.style.color = "red"; msgBox.textContent = "Name darf nicht leer sein!"; return; }
@@ -1436,9 +1504,12 @@
       try {
         await updateDoc(doc(db, "users", u.uid), { 
           username: newName, 
+          avatarUrl: newAvatar,
           bio: newBio,
           hobbies: hobbiesArray 
         });
+        
+        document.getElementById("profAvatarPreview").src = newAvatar !== "" ? newAvatar : defaultAvatarUrl;
         msgBox.style.color = "green"; msgBox.textContent = "Profil erfolgreich aktualisiert!";
       } catch(err) { msgBox.style.color = "red"; msgBox.textContent = "Fehler beim Speichern."; }
     }
@@ -1492,7 +1563,6 @@
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         
-        // Aktuelles Datum formatieren (TT.MM.JJJJ)
         const d = new Date();
         const formattedDate = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
 
@@ -1503,6 +1573,7 @@
           msgCount: 0, 
           hobbies: [],
           bio: "",
+          avatarUrl: "",
           registriertAm: formattedDate
         });
         
@@ -1541,6 +1612,7 @@
             msgCount: userData.msgCount || 0, 
             hobbies: userData.hobbies || [],
             bio: userData.bio || "",
+            avatarUrl: userData.avatarUrl || "",
             registriertAm: userData.registriertAm || "Schulprojekt-Start"
           };
         });
@@ -1574,16 +1646,22 @@
           const messageDiv = document.createElement("div");
           messageDiv.classList.add("message");
 
-          const wrapperDiv = document.createElement("div");
-          wrapperDiv.classList.add("message-content-wrapper");
-
-          const textSpan = document.createElement("span");
           const cachedUser = userCache[data.senderId];
           const displayUsername = cachedUser ? cachedUser.username : "Anonym";
           const userEmail = cachedUser ? cachedUser.email : ""; 
           const count = cachedUser ? cachedUser.msgCount : 0;
           const userHobbies = cachedUser ? cachedUser.hobbies : [];
+          const userAvatar = cachedUser ? cachedUser.avatarUrl : "";
           
+          const avatarImg = document.createElement("img");
+          avatarImg.classList.add("chat-avatar");
+          avatarImg.src = userAvatar !== "" ? userAvatar : defaultAvatarUrl;
+          avatarImg.alt = "Avatar";
+
+          const wrapperDiv = document.createElement("div");
+          wrapperDiv.classList.add("message-content-wrapper");
+
+          const textSpan = document.createElement("span");
           const userHasAdminMails = adminMailCache[data.senderId] || false;
 
           const rank = getRankInfo(count, data.senderId, userHasAdminMails);
@@ -1618,6 +1696,7 @@
           timeSpan.classList.add("time");
           timeSpan.textContent = data.time;
 
+          messageDiv.appendChild(avatarImg);
           messageDiv.appendChild(wrapperDiv);
           messageDiv.appendChild(timeSpan);
           messagesContainer.appendChild(messageDiv);
