@@ -195,7 +195,7 @@
       gap: 10px;
     }
 
-    /* NEU: SIDEBAR LINKS VOM CHAT */
+    /* SIDEBAR LINKS VOM CHAT */
     .forum-sidebar-left-boxes {
       position: absolute;
       top: 20px;
@@ -731,13 +731,12 @@
 
 <body>
 
-  <!-- KONTROLL-BOXEN OBEN RECHTS (THEME TOGGLE + LOGIN SWITCH) -->
   <div class="top-controls">
     <div class="toggle-box" id="toggleBox">
       <div id="toRegisterText">Noch kein Konto? <span onclick="showRegister()">Registrieren</span></div>
       <div id="toLoginText" style="display:none;">Bereits registriert? <span onclick="showLogin()">Anmelden</span></div>
     </div>
-    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Design wechseln">🌙</button>
+    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Design wechseln">Mond</button>
   </div>
 
   <div class="login-box" id="loginBox">
@@ -750,7 +749,6 @@
       Passwort vergessen? Schreiben Sie eine E-Mail an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a>
     </div>
     
-    <!-- REGELN BEIM LOGIN -->
     <div class="auth-rules-container">
       <div class="auth-rules-notice">Wer einen Account gründet oder sich anmeldet, akzeptiert die Regeln:</div>
       <ol class="auth-rules-list">
@@ -773,7 +771,6 @@
       Passwort vergessen? Schreiben Sie eine E-Mail an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a>
     </div>
 
-    <!-- REGELN BEI DER REGISTRIERUNG -->
     <div class="auth-rules-container">
       <div class="auth-rules-notice">Wer einen Account gründet oder sich anmeldet, akzeptiert die Regeln:</div>
       <ol class="auth-rules-list">
@@ -790,41 +787,36 @@
       <h1>HAK-Sacre-coeur</h1>
     </div>
 
-    <!-- LIVE NEWS SECTION OBEN -->
     <div class="news-container" id="newsSection">
-      <div class="news-header-title">🚨 WICHTIGE NEWS & ANKÜNDIGUNGEN:</div>
+      <div class="news-header-title">WICHTIGE NEWS UND ANKÜNDIGUNGEN:</div>
       <div class="news-text-display" id="newsTextDisplay">Lade aktuelle News...</div>
       
-      <!-- Steuerelemente für den Admin -->
       <div class="news-admin-control" id="newsAdminControl" style="display: none;">
         <input type="text" id="newsInput" placeholder="Neue Ankündigung schreiben..." style="margin-bottom:0;">
         <button onclick="submitNews()" style="width:auto; background:#c53030;">Aktualisieren</button>
       </div>
     </div>
 
-    <!-- NEU: SIDEBAR LINKS (NUR HILFE) -->
     <div class="forum-sidebar-left-boxes">
-      <div class="sidebar-box" style="background: #fff5f5; border-color: #feb2b2; color: #c53030;" onclick="openPopup('helpPopup')">Hilfe & Support 🆘</div>
+      <div class="sidebar-box" style="background: #fff5f5; border-color: #feb2b2; color: #c53030;" onclick="openPopup('helpPopup')">Hilfe und Support</div>
     </div>
 
-    <!-- SIDEBAR RECHTS -->
     <div class="forum-sidebar-boxes">
       <div class="sidebar-box" style="background: #eef2f7; border-color: #d0dbe5; color: #2c3e50;" onclick="openPopup('standPopup')">Für was ich stehe</div>
       <div class="sidebar-box" style="background: #fff9e6; border-color: #ffe0b3; color: #333;" onclick="openPopup('rulesPopup')">Regeln</div>
       <div class="sidebar-box" onclick="openPopup('rankPopup')">Rangsystem anschauen</div>
       <div class="sidebar-box" onclick="openPopup('profilePopup')">Mein Profil</div>
-      <div class="sidebar-box" onclick="openPopup('mailboxPopup')" style="background: #e6f2ff; color: #007bff; border-color: #b3d7ff;">Mein Postfach ✉</div>
-      <div class="sidebar-box" onclick="openPopup('suggestionPopup')" style="background: #f0fff4; color: #38a169; border-color: #c6f6d5;">Vorschläge 💡</div>
+      <div class="sidebar-box" onclick="openPopup('mailboxPopup')" style="background: #e6f2ff; color: #007bff; border-color: #b3d7ff;">Mein Postfach</div>
+      <div class="sidebar-box" onclick="openPopup('suggestionPopup')" style="background: #f0fff4; color: #38a169; border-color: #c6f6d5;">Vorschläge</div>
       
-      <!-- NEU: ADMIN EXKLUSIVE OPTION UNTER VORSCHLÄGE -->
-      <div class="sidebar-box" id="adminHelpReportsBtn" style="display: none; background: #fff0f6; color: #d53f8c; border-color: #fbb6ce;" onclick="openPopup('adminHelpReportsPopup')">Hilfe-Anträge sammeln 🛡️</div>
+      <div class="sidebar-box" id="adminHelpReportsBtn" style="display: none; background: #fff0f6; color: #d53f8c; border-color: #fbb6ce;" onclick="openPopup('adminHelpReportsPopup')">Hilfe-Anträge sammeln</div>
       
-      <div class="sidebar-box" id="secretNetfxBtn" style="display: none; background: #1a1a1a; color: #ff3333; border-color: #ff0000;" onclick="openPopup('netfxPopup')">Net.fx ⚙</div>
+      <div class="sidebar-box" id="secretNetfxBtn" style="display: none; background: #1a1a1a; color: #ff3333; border-color: #ff0000;" onclick="openPopup('netfxPopup')">Net.fx</div>
       <div class="sidebar-box" onclick="logout()" style="color: red; border-color: #ffa0a0; margin-top: auto;">Abmelden</div>
       
       <div class="scroll-buttons-container">
-        <button class="scroll-btn" onclick="scrollChat('top')">▲ Nach oben</button>
-        <button class="scroll-btn" onclick="scrollChat('bottom')">▼ Nach unten</button>
+        <button class="scroll-btn" onclick="scrollChat('top')">Nach oben</button>
+        <button class="scroll-btn" onclick="scrollChat('bottom')">Nach unten</button>
       </div>
     </div>
 
@@ -837,13 +829,10 @@
     <div class="char-counter" id="charCounter">0 / 500 Zeichen</div>
   </div>
 
-  <!-- POPUPS -->
-  
-  <!-- NEU: POPUP FÜR HILFE FORMULAR (LINKS) -->
   <div class="popup-overlay" id="helpPopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('helpPopup')">×</span>
-      <h3>Hilfe & Support anfordern</h3>
+      <h3>Hilfe und Support anfordern</h3>
       <div id="helpMessage" style="text-align:center; margin-bottom:10px; font-weight:bold; font-size:0.9rem;"></div>
       
       <label style="font-size:0.9rem; font-weight:bold;">1. Thema:</label>
@@ -860,7 +849,6 @@
     </div>
   </div>
 
-  <!-- NEU: POPUP FÜR ADMIN SATELLIT / ANTRÄGE SAMMELN (RECHTS) -->
   <div class="popup-overlay" id="adminHelpReportsPopup">
     <div class="popup-content" style="max-width: 550px;">
       <span class="popup-close" onclick="closePopup('adminHelpReportsPopup')">×</span>
@@ -891,7 +879,6 @@
     </div>
   </div>
 
-  <!-- POPUP: FREMDE PROFILE ANZEIGEN -->
   <div class="popup-overlay" id="userViewPopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('userViewPopup')">×</span>
@@ -905,7 +892,6 @@
     </div>
   </div>
 
-  <!-- POPUP: MEIN PROFIL -->
   <div class="popup-overlay" id="profilePopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('profilePopup')">×</span>
@@ -980,7 +966,7 @@
   <div class="popup-overlay" id="suggestionPopup">
     <div class="popup-content" style="max-width: 500px;">
       <span class="popup-close" onclick="closePopup('suggestionPopup')">×</span>
-      <h3>Vorschläge & Ideen</h3>
+      <h3>Vorschläge und Ideen</h3>
       
       <div id="suggestionMessage" style="text-align:center; margin-bottom:10px; font-weight:bold; font-size:0.9rem;"></div>
       
@@ -1005,7 +991,7 @@
       
       <div id="sendMailMessage" style="text-align:center; margin-bottom:10px; font-weight:bold;"></div>
       <input type="text" id="mailTextInput" placeholder="Deine geheime Nachricht..." maxlength="300">
-      <button onclick="submitPrivateMail()">Abschalken</button>
+      <button onclick="submitPrivateMail()">Absenden</button>
     </div>
   </div>
 
@@ -1051,7 +1037,7 @@
     let unsubscribeActiveChat = null;
     let unsubscribeSuggestions = null;
     let unsubscribeNews = null;
-    let unsubscribeHelpReports = null; // Neu für Admin Live-Überwachung
+    let unsubscribeHelpReports = null;
 
     let activeChatPartnerUid = null;
 
@@ -1072,9 +1058,9 @@
     function updateThemeButton(theme) {
       const btn = document.getElementById("themeToggleBtn");
       if (theme === "dark") {
-        btn.textContent = "☀️";
+        btn.textContent = "Sonne";
       } else {
-        btn.textContent = "🌙";
+        btn.textContent = "Mond";
       }
     }
 
@@ -1090,7 +1076,7 @@
             showForum();
             if (user.uid === adminUid) {
               document.getElementById("newsAdminControl").style.display = "flex";
-              document.getElementById("adminHelpReportsBtn").style.display = "block"; // Macht Sammel-Button für Admin sichtbar
+              document.getElementById("adminHelpReportsBtn").style.display = "block";
             } else {
               document.getElementById("newsAdminControl").style.display = "none";
               document.getElementById("adminHelpReportsBtn").style.display = "none";
@@ -1170,7 +1156,6 @@
       }
     }
 
-    // --- NEU: ANONYME HILFE ANTRÄGE SENDEN (USER-LOGIK) ---
     function resetHelpForm() {
       document.getElementById("helpTopicInput").value = "";
       document.getElementById("helpUsernameInput").value = "";
@@ -1211,7 +1196,6 @@
       }
     }
 
-    // --- NEU: HILFE ANTRÄGE SAMMELN & LIVE ANZEIGEN (ADMIN-LOGIK) ---
     function listenToHelpReportsLive() {
       if (unsubscribeHelpReports) unsubscribeHelpReports();
       if (!auth.currentUser || auth.currentUser.uid !== adminUid) return;
@@ -1322,7 +1306,7 @@
             const item = document.createElement("div");
             item.classList.add("chat-partner-item");
             item.onclick = () => openDirectChat(partnerUid, partnerName);
-            item.innerHTML = `<span>Chat mit <strong>${partnerName}</strong></span> <span style="font-size:0.8rem; color:#007bff;">Öffnen →</span>`;
+            item.innerHTML = `<span>Chat mit <strong>${partnerName}</strong></span> <span style="font-size:0.8rem; color:#007bff;">Öffnen</span>`;
             
             container.appendChild(item);
           }
@@ -1485,9 +1469,9 @@
             <div class="suggestion-meta">
               <span>Von: <strong>${senderName}</strong></span>
               <div class="suggestion-votes">
-                <button class="${likeClass}" onclick="voteSuggestion('${s.id}', 'like')">👍</button>
+                <button class="${likeClass}" onclick="voteSuggestion('${s.id}', 'like')">Dafür</button>
                 <span class="vote-score">${s.score}</span>
-                <button class="${dislikeClass}" onclick="voteSuggestion('${s.id}', 'dislike')">👎</button>
+                <button class="${dislikeClass}" onclick="voteSuggestion('${s.id}', 'dislike')">Dagegen</button>
               </div>
             </div>
           `;
@@ -1810,7 +1794,7 @@
           let badgeHTML = `<span class="rank-badge" style="background: rgba(0,0,0,0.25);">${rank.name}</span>`;
 
           const escapedName = displayUsername.replace(/['"]/g, '');
-          const mailButtonHTML = `<button class="msg-mail-btn" onclick="openSendMail('${data.senderId}', '${escapedName}')">[✉]</button>`;
+          const mailButtonHTML = `<button class="msg-mail-btn" onclick="openSendMail('${data.senderId}', '${escapedName}')">[Brief]</button>`;
 
           let emailHTML = "";
           if (auth.currentUser && auth.currentUser.uid === adminUid && userEmail !== "") {
