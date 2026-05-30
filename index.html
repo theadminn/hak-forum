@@ -195,6 +195,17 @@
       gap: 10px;
     }
 
+    /* NEU: SIDEBAR LINKS VOM CHAT */
+    .forum-sidebar-left-boxes {
+      position: absolute;
+      top: 20px;
+      left: -240px;
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
     .sidebar-box {
       background: var(--box-bg);
       padding: 12px 15px;
@@ -331,7 +342,7 @@
       top: -4px;
     }
 
-    /* NEU: TRADITIONELLE REGELN IM LOGIN-FENSTER */
+    /* TRADITIONELLE REGELN IM LOGIN-FENSTER */
     .auth-rules-container {
       margin-top: 20px;
       padding-top: 15px;
@@ -449,8 +460,8 @@
       text-align: right;
     }
 
-    /* VORSCHLÄGE STYLING */
-    .suggestion-item {
+    /* VORSCHLÄGE & HILFE-LISTE STYLING */
+    .suggestion-item, .help-report-item {
       background: var(--chat-bg);
       border: 1px solid var(--border-color);
       border-radius: 10px;
@@ -462,24 +473,18 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
-    .suggestion-text {
+    .suggestion-text, .help-report-text {
       font-size: 1rem;
       color: var(--text-color);
       word-break: break-word;
       line-height: 1.4;
     }
 
-    .suggestion-meta {
+    .suggestion-meta, .help-report-meta {
       font-size: 0.8rem;
       color: var(--text-muted);
       display: flex;
       justify-content: space-between;
-      align-items: center;
-    }
-
-    .suggestion-votes {
-      display: flex;
-      gap: 10px;
       align-items: center;
     }
 
@@ -702,7 +707,7 @@
     }
 
     @media(max-width:1200px){
-      .forum-sidebar-boxes {
+      .forum-sidebar-boxes, .forum-sidebar-left-boxes {
         position: static;
         width: 100%;
         margin-bottom: 15px;
@@ -719,13 +724,14 @@
       h1{ font-size:1.5rem; }
       .messages{ height:300px; }
       .input-area{ flex-direction:column; }
-      .forum-sidebar-boxes { flex-direction: column; }
+      .forum-sidebar-boxes, .forum-sidebar-left-boxes { flex-direction: column; }
     }
   </style>
 </head>
 
 <body>
 
+  <!-- KONTROLL-BOXEN OBEN RECHTS (THEME TOGGLE + LOGIN SWITCH) -->
   <div class="top-controls">
     <div class="toggle-box" id="toggleBox">
       <div id="toRegisterText">Noch kein Konto? <span onclick="showRegister()">Registrieren</span></div>
@@ -744,6 +750,7 @@
       Passwort vergessen? Schreiben Sie eine E-Mail an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a>
     </div>
     
+    <!-- REGELN BEIM LOGIN -->
     <div class="auth-rules-container">
       <div class="auth-rules-notice">Wer einen Account gründet oder sich anmeldet, akzeptiert die Regeln:</div>
       <ol class="auth-rules-list">
@@ -766,6 +773,7 @@
       Passwort vergessen? Schreiben Sie eine E-Mail an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a>
     </div>
 
+    <!-- REGELN BEI DER REGISTRIERUNG -->
     <div class="auth-rules-container">
       <div class="auth-rules-notice">Wer einen Account gründet oder sich anmeldet, akzeptiert die Regeln:</div>
       <ol class="auth-rules-list">
@@ -782,16 +790,24 @@
       <h1>HAK-Sacre-coeur</h1>
     </div>
 
+    <!-- LIVE NEWS SECTION OBEN -->
     <div class="news-container" id="newsSection">
       <div class="news-header-title">🚨 WICHTIGE NEWS & ANKÜNDIGUNGEN:</div>
       <div class="news-text-display" id="newsTextDisplay">Lade aktuelle News...</div>
       
+      <!-- Steuerelemente für den Admin -->
       <div class="news-admin-control" id="newsAdminControl" style="display: none;">
         <input type="text" id="newsInput" placeholder="Neue Ankündigung schreiben..." style="margin-bottom:0;">
         <button onclick="submitNews()" style="width:auto; background:#c53030;">Aktualisieren</button>
       </div>
     </div>
 
+    <!-- NEU: SIDEBAR LINKS (NUR HILFE) -->
+    <div class="forum-sidebar-left-boxes">
+      <div class="sidebar-box" style="background: #fff5f5; border-color: #feb2b2; color: #c53030;" onclick="openPopup('helpPopup')">Hilfe & Support 🆘</div>
+    </div>
+
+    <!-- SIDEBAR RECHTS -->
     <div class="forum-sidebar-boxes">
       <div class="sidebar-box" style="background: #eef2f7; border-color: #d0dbe5; color: #2c3e50;" onclick="openPopup('standPopup')">Für was ich stehe</div>
       <div class="sidebar-box" style="background: #fff9e6; border-color: #ffe0b3; color: #333;" onclick="openPopup('rulesPopup')">Regeln</div>
@@ -799,6 +815,10 @@
       <div class="sidebar-box" onclick="openPopup('profilePopup')">Mein Profil</div>
       <div class="sidebar-box" onclick="openPopup('mailboxPopup')" style="background: #e6f2ff; color: #007bff; border-color: #b3d7ff;">Mein Postfach ✉</div>
       <div class="sidebar-box" onclick="openPopup('suggestionPopup')" style="background: #f0fff4; color: #38a169; border-color: #c6f6d5;">Vorschläge 💡</div>
+      
+      <!-- NEU: ADMIN EXKLUSIVE OPTION UNTER VORSCHLÄGE -->
+      <div class="sidebar-box" id="adminHelpReportsBtn" style="display: none; background: #fff0f6; color: #d53f8c; border-color: #fbb6ce;" onclick="openPopup('adminHelpReportsPopup')">Hilfe-Anträge sammeln 🛡️</div>
+      
       <div class="sidebar-box" id="secretNetfxBtn" style="display: none; background: #1a1a1a; color: #ff3333; border-color: #ff0000;" onclick="openPopup('netfxPopup')">Net.fx ⚙</div>
       <div class="sidebar-box" onclick="logout()" style="color: red; border-color: #ffa0a0; margin-top: auto;">Abmelden</div>
       
@@ -815,6 +835,40 @@
       <button onclick="sendMessage()" style="width:auto;">Senden</button>
     </div>
     <div class="char-counter" id="charCounter">0 / 500 Zeichen</div>
+  </div>
+
+  <!-- POPUPS -->
+  
+  <!-- NEU: POPUP FÜR HILFE FORMULAR (LINKS) -->
+  <div class="popup-overlay" id="helpPopup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup('helpPopup')">×</span>
+      <h3>Hilfe & Support anfordern</h3>
+      <div id="helpMessage" style="text-align:center; margin-bottom:10px; font-weight:bold; font-size:0.9rem;"></div>
+      
+      <label style="font-size:0.9rem; font-weight:bold;">1. Thema:</label>
+      <input type="text" id="helpTopicInput" placeholder="z.B. Mobbing, technischer Fehler, Belästigung">
+      
+      <label style="font-size:0.9rem; font-weight:bold;">2. Username:</label>
+      <input type="text" id="helpUsernameInput" placeholder="Dein Forum-Name">
+      <span class="name-hint" style="margin-bottom:12px; display:block; color:#c53030;">Wir werden Sie niemals nach Ihren echten Daten fragen.</span>
+      
+      <label style="font-size:0.9rem; font-weight:bold;">3. Nachricht:</label>
+      <textarea id="helpTextInput" placeholder="Beschreibe dein Anliegen so genau wie möglich..." maxlength="500" style="height:100px;"></textarea>
+      
+      <button onclick="submitHelpReport()" style="background:#c53030;">Anonym absenden</button>
+    </div>
+  </div>
+
+  <!-- NEU: POPUP FÜR ADMIN SATELLIT / ANTRÄGE SAMMELN (RECHTS) -->
+  <div class="popup-overlay" id="adminHelpReportsPopup">
+    <div class="popup-content" style="max-width: 550px;">
+      <span class="popup-close" onclick="closePopup('adminHelpReportsPopup')">×</span>
+      <h3>Eingegangene Hilfe-Anträge (Anonym)</h3>
+      <div id="adminHelpListContainer" style="max-height: 60vh; overflow-y: auto; padding-right: 5px;">
+        <div style="text-align:center; color:#777; font-style:italic;">Lade Anträge...</div>
+      </div>
+    </div>
   </div>
 
   <div class="popup-overlay" id="standPopup">
@@ -837,6 +891,7 @@
     </div>
   </div>
 
+  <!-- POPUP: FREMDE PROFILE ANZEIGEN -->
   <div class="popup-overlay" id="userViewPopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('userViewPopup')">×</span>
@@ -850,6 +905,7 @@
     </div>
   </div>
 
+  <!-- POPUP: MEIN PROFIL -->
   <div class="popup-overlay" id="profilePopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('profilePopup')">×</span>
@@ -863,7 +919,7 @@
       <span class="name-hint" style="margin-bottom:15px; display:block;">Es wird empfohlen, keine echten Namen zu verwenden.</span>
 
       <label style="font-size:0.9rem; font-weight:bold;">Profilbild-URL:</label>
-      <input type="text" id="profAvatarInput" placeholder="https://beispiel.com/dein-bild.jpg" style="margin-top:5px; margin-bottom:15px;">
+      <input type="text" id="profAvatarInput" placeholder="https://beispiel.com/deid-bild.jpg" style="margin-top:5px; margin-bottom:15px;">
 
       <label style="font-size:0.9rem; font-weight:bold;">Biografie (Bio) ändern:</label>
       <textarea id="profBioInput" placeholder="Erzähle etwas über dich (max. 150 Zeichen)..." maxlength="150" style="margin-top:5px; margin-bottom:15px;"></textarea>
@@ -949,7 +1005,7 @@
       
       <div id="sendMailMessage" style="text-align:center; margin-bottom:10px; font-weight:bold;"></div>
       <input type="text" id="mailTextInput" placeholder="Deine geheime Nachricht..." maxlength="300">
-      <button onclick="submitPrivateMail()">Abschicken</button>
+      <button onclick="submitPrivateMail()">Abschalken</button>
     </div>
   </div>
 
@@ -995,6 +1051,7 @@
     let unsubscribeActiveChat = null;
     let unsubscribeSuggestions = null;
     let unsubscribeNews = null;
+    let unsubscribeHelpReports = null; // Neu für Admin Live-Überwachung
 
     let activeChatPartnerUid = null;
 
@@ -1033,8 +1090,10 @@
             showForum();
             if (user.uid === adminUid) {
               document.getElementById("newsAdminControl").style.display = "flex";
+              document.getElementById("adminHelpReportsBtn").style.display = "block"; // Macht Sammel-Button für Admin sichtbar
             } else {
               document.getElementById("newsAdminControl").style.display = "none";
+              document.getElementById("adminHelpReportsBtn").style.display = "none";
             }
           } else {
             auth.signOut();
@@ -1048,12 +1107,15 @@
       if(id === 'profilePopup') { loadProfileFields(); }
       if(id === 'mailboxPopup') { backToMailboxOverview(); listenToMailboxLive(); }
       if(id === 'suggestionPopup') { document.getElementById("suggestionMessage").textContent = ""; listenToSuggestionsLive(); }
+      if(id === 'helpPopup') { document.getElementById("helpMessage").textContent = ""; resetHelpForm(); }
+      if(id === 'adminHelpReportsPopup') { listenToHelpReportsLive(); }
     }
 
     window.closePopup = function(id) { 
       document.getElementById(id).style.display = "none"; 
       if(id === 'mailboxPopup' && unsubscribeActiveChat) { unsubscribeActiveChat(); unsubscribeActiveChat = null; }
       if(id === 'suggestionPopup' && unsubscribeSuggestions) { unsubscribeSuggestions(); unsubscribeSuggestions = null; }
+      if(id === 'adminHelpReportsPopup' && unsubscribeHelpReports) { unsubscribeHelpReports(); unsubscribeHelpReports = null; }
     }
 
     window.openUserView = function(userId) {
@@ -1070,8 +1132,8 @@
       document.getElementById("viewAvatar").src = cachedUser.avatarUrl || defaultAvatarUrl;
       
       const rankSpan = document.getElementById("viewRank");
-      rankSpan.textContent = rank.name;
-      rankSpan.style.color = rank.color;
+      rankSpan.textContent = r.name;
+      rankSpan.style.color = r.color;
       rankSpan.style.fontWeight = "bold";
 
       const hobbiesSpan = document.getElementById("viewHobbies");
@@ -1108,16 +1170,93 @@
       }
     }
 
-    window.openSendMail = function(targetUid, targetName) {
-      if(auth.currentUser && auth.currentUser.uid === targetUid) {
-        alert("Du kannst dir selbst keine Nachricht schicken!");
+    // --- NEU: ANONYME HILFE ANTRÄGE SENDEN (USER-LOGIK) ---
+    function resetHelpForm() {
+      document.getElementById("helpTopicInput").value = "";
+      document.getElementById("helpUsernameInput").value = "";
+      document.getElementById("helpTextInput").value = "";
+    }
+
+    window.submitHelpReport = async function() {
+      const topic = document.getElementById("helpTopicInput").value.trim();
+      const username = document.getElementById("helpUsernameInput").value.trim();
+      const text = document.getElementById("helpTextInput").value.trim();
+      const msgBox = document.getElementById("helpMessage");
+
+      if (topic === "" || username === "" || text === "") {
+        msgBox.style.color = "red";
+        msgBox.textContent = "Bitte alle Felder komplett ausfüllen!";
         return;
       }
-      document.getElementById("mailTargetName").textContent = targetName;
-      document.getElementById("mailTargetUid").value = targetUid;
-      document.getElementById("mailTextInput").value = "";
-      document.getElementById("sendMailMessage").textContent = "";
-      openPopup("sendMailPopup");
+
+      try {
+        const d = new Date();
+        const formattedDate = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()} um ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+
+        await addDoc(collection(db, "HilfeAntraege"), {
+          thema: topic,
+          username: username,
+          nachricht: text,
+          gesendetAm: formattedDate,
+          timestamp: Date.now()
+        });
+
+        msgBox.style.color = "green";
+        msgBox.textContent = "Antrag anonym eingereicht! Der Admin wird sich darum kümmern.";
+        resetHelpForm();
+        setTimeout(() => { closePopup("helpPopup"); }, 2000);
+      } catch (err) {
+        msgBox.style.color = "red";
+        msgBox.textContent = "Fehler beim Absenden des Antrags.";
+      }
+    }
+
+    // --- NEU: HILFE ANTRÄGE SAMMELN & LIVE ANZEIGEN (ADMIN-LOGIK) ---
+    function listenToHelpReportsLive() {
+      if (unsubscribeHelpReports) unsubscribeHelpReports();
+      if (!auth.currentUser || auth.currentUser.uid !== adminUid) return;
+
+      const container = document.getElementById("adminHelpListContainer");
+      const q = query(collection(db, "HilfeAntraege"), orderBy("timestamp", "desc"));
+
+      unsubscribeHelpReports = onSnapshot(q, (snapshot) => {
+        container.innerHTML = "";
+        if (snapshot.empty) {
+          container.innerHTML = "<div style='text-align:center; color:#777; font-style:italic; margin-top:20px;'>Keine ausstehenden Hilfe-Anträge im System.</div>";
+          return;
+        }
+
+        snapshot.forEach((docSnap) => {
+          const h = docSnap.data();
+          const item = document.createElement("div");
+          item.classList.add("help-report-item");
+          item.style.borderLeft = "4px solid #d53f8c";
+
+          item.innerHTML = `
+            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.9rem; color:#d53f8c; margin-bottom:5px;">
+              <span>Thema: ${h.thema}</span>
+              <span style="font-size:0.75rem; color:#777;">${h.gesendetAm}</span>
+            </div>
+            <div class="help-report-text" style="background:var(--box-bg); padding:10px; border-radius:6px; border:1px solid var(--border-light); margin-bottom:5px;">
+              ${h.nachricht}
+            </div>
+            <div class="help-report-meta" style="font-size:0.8rem;">
+              <span>Gemeldeter User: <strong>${h.username}</strong></span>
+              <button onclick="deleteHelpReport('${docSnap.id}')" style="background:#e53e3e; padding:4px 8px; font-size:0.75rem; width:auto; border-radius:4px; margin-left:10px;">Erledigt / Löschen</button>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      });
+    }
+
+    window.deleteHelpReport = async function(docId) {
+      if (!confirm("Möchtest du diesen Fall als erledigt markieren und permanent löschen?")) return;
+      try {
+        await deleteDoc(doc(db, "HilfeAntraege", docId));
+      } catch (err) {
+        alert("Fehler beim Löschen des Antrags.");
+      }
     }
 
     window.submitPrivateMail = async function() {
@@ -1589,6 +1728,7 @@
       if(unsubscribeActiveChat) unsubscribeActiveChat();
       if(unsubscribeSuggestions) unsubscribeSuggestions();
       if(unsubscribeNews) unsubscribeNews();
+      if(unsubscribeHelpReports) unsubscribeHelpReports();
       await signOut(auth);
       location.reload();
     }
