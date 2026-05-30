@@ -173,6 +173,31 @@
       padding-bottom: 8px;
     }
 
+    /* Regeln Liste Styling */
+    .rules-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .rules-list li {
+      position: relative;
+      padding-left: 30px;
+      margin-bottom: 15px;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #333;
+    }
+
+    .rules-list li::before {
+      content: "•";
+      color: #007bff;
+      font-weight: bold;
+      font-size: 1.8rem;
+      position: absolute;
+      left: 5px;
+      top: -4px;
+    }
+
     .hobby-inputs-container {
       margin-top: 5px;
       margin-bottom: 15px;
@@ -251,7 +276,6 @@
     }
     .msg-mail-btn:hover { color: white; text-decoration: underline; }
 
-    /* NEU: Klickbarer Username Style */
     .chat-username-clickable {
       cursor: pointer;
     }
@@ -447,6 +471,8 @@
     </div>
 
     <div class="forum-sidebar-boxes">
+      <div class="sidebar-box" style="background: #fff9e6; border-color: #ffe0b3;" onclick="openPopup('rulesPopup')">Regeln</div>
+      
       <div class="sidebar-box" onclick="openPopup('rankPopup')">Rangsystem anschauen</div>
       <div class="sidebar-box" onclick="openPopup('profilePopup')">Mein Profil</div>
       
@@ -472,6 +498,18 @@
 
     <div class="support-footer">
       Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="rulesPopup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup('rulesPopup')">×</span>
+      <h3>Forenregeln</h3>
+      <ul class="rules-list">
+        <li><strong>1. Volle Meinungsfreiheit:</strong> Volle Meinungsfreiheit und keine Zensur, keiner wird unterdrückt.</li>
+        <li><strong>2. Respekt:</strong> Versuchen respektvoll zu bleiben.</li>
+        <li><strong>3. Haftungsausschluss:</strong> Der Admin haftet nie.</li>
+      </ul>
     </div>
   </div>
 
@@ -607,7 +645,6 @@
 
     window.closePopup = function(id) { document.getElementById(id).style.display = "none"; }
 
-    // NEU: Funktion zum Öffnen der Profil-Ansicht eines anderen Users
     window.openUserView = function(userId) {
       const cachedUser = userCache[userId];
       if (!cachedUser) return;
@@ -945,7 +982,6 @@
             emailHTML = `<span class="admin-visible-email">(${userEmail})</span>`;
           }
 
-          // Geändert: Usernamen bekommen das onclick-Event zum Öffnen der Profilansicht
           if (data.senderId === adminUid) {
             textSpan.innerHTML = `<strong class="chat-username-clickable" onclick="openUserView('${data.senderId}')">Admin</strong> ${badgeHTML}: ${data.text}`;
           } else {
