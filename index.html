@@ -584,7 +584,7 @@
       margin-bottom:5px;
     }
 
-    input{
+    input, textarea{
       width:100%;
       padding:12px;
       border-radius:10px;
@@ -593,6 +593,12 @@
       color: var(--text-color);
       font-size:1rem;
       margin-bottom:12px;
+    }
+
+    textarea {
+      resize: none;
+      height: 70px;
+      font-family: Arial, sans-serif;
     }
 
     .input-area input { margin-bottom:0; }
@@ -635,14 +641,19 @@
       padding-right: 5px;
     }
 
-    .support-footer {
-      text-align:center;
-      margin-top:20px;
-      padding-top:15px;
-      border-top:1px solid var(--border-light);
+    .auth-footer-note {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.85rem;
       color: var(--text-muted);
-      font-size:0.9rem;
-      line-height:1.5;
+      line-height: 1.4;
+    }
+    .auth-footer-note a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .auth-footer-note a:hover {
+      text-decoration: underline;
     }
 
     @media(max-width:1200px){
@@ -685,6 +696,9 @@
     <input type="email" id="loginEmail" placeholder="E-Mail">
     <input type="password" id="loginPassword" placeholder="Passwort">
     <button onclick="login()">Anmelden</button>
+    <div class="auth-footer-note">
+      Passwort vergessen? Schreiben Sie eine E-Mail an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a>
+    </div>
   </div>
 
   <div class="register-box" id="registerBox">
@@ -695,6 +709,9 @@
     <input type="email" id="regEmail" placeholder="E-Mail">
     <input type="password" id="regPassword" placeholder="Passwort (mind. 6 Zeichen)">
     <button onclick="register()">Registrieren</button>
+    <div class="auth-footer-note">
+      Passwort vergessen? Schreiben Sie eine E-Mail an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a>
+    </div>
   </div>
 
   <div class="forum-box" id="forumBox">
@@ -717,20 +734,13 @@
 
     <!-- SIDEBAR RECHTS -->
     <div class="forum-sidebar-boxes">
-      <!-- NEUE BOX: FÜR WAS ICH STEHE -->
       <div class="sidebar-box" style="background: #eef2f7; border-color: #d0dbe5; color: #2c3e50;" onclick="openPopup('standPopup')">Für was ich stehe</div>
-
       <div class="sidebar-box" style="background: #fff9e6; border-color: #ffe0b3; color: #333;" onclick="openPopup('rulesPopup')">Regeln</div>
-      
       <div class="sidebar-box" onclick="openPopup('rankPopup')">Rangsystem anschauen</div>
       <div class="sidebar-box" onclick="openPopup('profilePopup')">Mein Profil</div>
-      
       <div class="sidebar-box" onclick="openPopup('mailboxPopup')" style="background: #e6f2ff; color: #007bff; border-color: #b3d7ff;">Mein Postfach ✉</div>
-      
       <div class="sidebar-box" onclick="openPopup('suggestionPopup')" style="background: #f0fff4; color: #38a169; border-color: #c6f6d5;">Vorschläge 💡</div>
-      
       <div class="sidebar-box" id="secretNetfxBtn" style="display: none; background: #1a1a1a; color: #ff3333; border-color: #ff0000;" onclick="openPopup('netfxPopup')">Net.fx ⚙</div>
-
       <div class="sidebar-box" onclick="logout()" style="color: red; border-color: #ffa0a0; margin-top: auto;">Abmelden</div>
       
       <div class="scroll-buttons-container">
@@ -746,14 +756,9 @@
       <button onclick="sendMessage()" style="width:auto;">Senden</button>
     </div>
     <div class="char-counter" id="charCounter">0 / 500 Zeichen</div>
-
-    <div class="support-footer">
-      Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
-    </div>
   </div>
 
   <!-- POPUPS -->
-  <!-- POPUP: FÜR WAS ICH STEHE -->
   <div class="popup-overlay" id="standPopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('standPopup')">×</span>
@@ -774,16 +779,20 @@
     </div>
   </div>
 
+  <!-- POPUP: FREMDE PROFILE ANZEIGEN -->
   <div class="popup-overlay" id="userViewPopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('userViewPopup')">×</span>
       <h3 id="viewTitle">Profil von ...</h3>
       <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Username:</strong> <span id="viewName">-</span></p>
+      <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Dabei seit:</strong> <span id="viewCreated">-</span></p>
       <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Rang:</strong> <span id="viewRank">-</span></p>
+      <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Biografie:</strong> <span id="viewBio" style="font-style: italic; white-space: pre-wrap;">-</span></p>
       <p style="margin-bottom: 12px; font-size: 1rem;"><strong>Hobbys:</strong> <span id="viewHobbies">-</span></p>
     </div>
   </div>
 
+  <!-- POPUP: MEIN PROFIL -->
   <div class="popup-overlay" id="profilePopup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup('profilePopup')">×</span>
@@ -793,6 +802,9 @@
       <label style="font-size:0.9rem; font-weight:bold;">Username ändern:</label>
       <input type="text" id="profNameInput" style="margin-top:5px; margin-bottom:4px;">
       <span class="name-hint" style="margin-bottom:15px; display:block;">Es wird empfohlen, keine echten Namen zu verwenden.</span>
+
+      <label style="font-size:0.9rem; font-weight:bold;">Biografie (Bio) ändern:</label>
+      <textarea id="profBioInput" placeholder="Erzähle etwas über dich (max. 150 Zeichen)..." maxlength="150" style="margin-top:5px; margin-bottom:15px;"></textarea>
       
       <label style="font-size:0.9rem; font-weight:bold;">Meine Hobbys:</label>
       <div class="hobby-inputs-container">
@@ -804,10 +816,11 @@
       </div>
 
       <p style="margin-bottom: 8px;"><strong>E-Mail:</strong> <span id="profEmail">-</span></p>
+      <p style="margin-bottom: 8px;"><strong>Dabei seit:</strong> <span id="profCreated">-</span></p>
       <p style="margin-bottom: 8px;"><strong>Nachrichten gesamt:</strong> <span id="profCount">0</span></p>
       <p style="margin-bottom: 20px;"><strong>Aktueller Rang:</strong> <span id="profRank">-</span></p>
       
-      <button onclick="saveProfileName()">Änderungen speichern</button>
+      <button onclick="saveProfileData()">Änderungen speichern</button>
     </div>
   </div>
 
@@ -969,7 +982,7 @@
 
     window.openPopup = function(id) {
       document.getElementById(id).style.display = "flex";
-      if(id === 'profilePopup') { loadProfileData(); }
+      if(id === 'profilePopup') { loadProfileFields(); }
       if(id === 'mailboxPopup') { backToMailboxOverview(); listenToMailboxLive(); }
       if(id === 'suggestionPopup') { document.getElementById("suggestionMessage").textContent = ""; listenToSuggestionsLive(); }
     }
@@ -989,6 +1002,8 @@
       
       document.getElementById("viewTitle").textContent = `Profil von ${cachedUser.username}`;
       document.getElementById("viewName").textContent = cachedUser.username;
+      document.getElementById("viewCreated").textContent = cachedUser.registriertAm || "Schulprojekt-Start";
+      document.getElementById("viewBio").textContent = cachedUser.bio || "Keine Biografie ausgefüllt.";
       
       const rankSpan = document.getElementById("viewRank");
       rankSpan.textContent = rank.name;
@@ -1374,7 +1389,7 @@
       return { name: "Admin-Like", color: "#28a745" };
     }
 
-    async function loadProfileData() {
+    async function loadProfileFields() {
       const u = auth.currentUser;
       if(!u) return;
       document.getElementById("profileMessage").textContent = "";
@@ -1387,7 +1402,9 @@
         const r = getRankInfo(count, u.uid, hasMailsWithAdmin);
         
         document.getElementById("profNameInput").value = d.username || "Anonym";
+        document.getElementById("profBioInput").value = d.bio || "";
         document.getElementById("profEmail").textContent = d.email || "";
+        document.getElementById("profCreated").textContent = d.registriertAm || "Schulprojekt-Start";
         document.getElementById("profCount").textContent = count;
         
         document.getElementById("profRank").textContent = r.name;
@@ -1402,10 +1419,11 @@
       }
     }
 
-    window.saveProfileName = async function() {
+    window.saveProfileData = async function() {
       const u = auth.currentUser;
       if(!u) return;
       const newName = document.getElementById("profNameInput").value.trim();
+      const newBio = document.getElementById("profBioInput").value.trim();
       const msgBox = document.getElementById("profileMessage");
       if(newName === "") { msgBox.style.color = "red"; msgBox.textContent = "Name darf nicht leer sein!"; return; }
 
@@ -1416,7 +1434,11 @@
       }
 
       try {
-        await updateDoc(doc(db, "users", u.uid), { username: newName, hobbies: hobbiesArray });
+        await updateDoc(doc(db, "users", u.uid), { 
+          username: newName, 
+          bio: newBio,
+          hobbies: hobbiesArray 
+        });
         msgBox.style.color = "green"; msgBox.textContent = "Profil erfolgreich aktualisiert!";
       } catch(err) { msgBox.style.color = "red"; msgBox.textContent = "Fehler beim Speichern."; }
     }
@@ -1469,7 +1491,21 @@
 
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, "users", userCredential.user.uid), { username: usernameInput, email: email, approved: false, msgCount: 0, hobbies: [] });
+        
+        // Aktuelles Datum formatieren (TT.MM.JJJJ)
+        const d = new Date();
+        const formattedDate = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
+
+        await setDoc(doc(db, "users", userCredential.user.uid), { 
+          username: usernameInput, 
+          email: email, 
+          approved: false, 
+          msgCount: 0, 
+          hobbies: [],
+          bio: "",
+          registriertAm: formattedDate
+        });
+        
         error.style.color = "green"; error.textContent = "Registriert! Warte auf Freischaltung.";
         setTimeout(showLogin, 3000);
       } catch (err) { error.textContent = "Fehler bei Registrierung."; }
@@ -1503,7 +1539,9 @@
             username: userData.username || "Anonym", 
             email: userData.email || "", 
             msgCount: userData.msgCount || 0, 
-            hobbies: userData.hobbies || []
+            hobbies: userData.hobbies || [],
+            bio: userData.bio || "",
+            registriertAm: userData.registriertAm || "Schulprojekt-Start"
           };
         });
         checkSecretRankRequirements();
