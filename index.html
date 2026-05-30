@@ -561,7 +561,6 @@
       word-break:break-word;
     }
 
-    /* Damit der Text auf extrem dunklen Admin/Noob-Rängen im Dark Mode perfekt lesbar bleibt */
     [data-theme="dark"] .message {
       color: #fff;
     }
@@ -671,6 +670,7 @@
 
 <body>
 
+  <!-- KONTROLL-BOXEN OBEN RECHTS (THEME TOGGLE + LOGIN SWITCH) -->
   <div class="top-controls">
     <div class="toggle-box" id="toggleBox">
       <div id="toRegisterText">Noch kein Konto? <span onclick="showRegister()">Registrieren</span></div>
@@ -703,17 +703,23 @@
       <h1>HAK-Sacre-coeur</h1>
     </div>
 
+    <!-- LIVE NEWS SECTION OBEN -->
     <div class="news-container" id="newsSection">
       <div class="news-header-title">🚨 WICHTIGE NEWS & ANKÜNDIGUNGEN:</div>
       <div class="news-text-display" id="newsTextDisplay">Lade aktuelle News...</div>
       
+      <!-- Steuerelemente für den Admin -->
       <div class="news-admin-control" id="newsAdminControl" style="display: none;">
         <input type="text" id="newsInput" placeholder="Neue Ankündigung schreiben..." style="margin-bottom:0;">
         <button onclick="submitNews()" style="width:auto; background:#c53030;">Aktualisieren</button>
       </div>
     </div>
 
+    <!-- SIDEBAR RECHTS -->
     <div class="forum-sidebar-boxes">
+      <!-- NEUE BOX: FÜR WAS ICH STEHE -->
+      <div class="sidebar-box" style="background: #eef2f7; border-color: #d0dbe5; color: #2c3e50;" onclick="openPopup('standPopup')">Für was ich stehe</div>
+
       <div class="sidebar-box" style="background: #fff9e6; border-color: #ffe0b3; color: #333;" onclick="openPopup('rulesPopup')">Regeln</div>
       
       <div class="sidebar-box" onclick="openPopup('rankPopup')">Rangsystem anschauen</div>
@@ -743,6 +749,16 @@
 
     <div class="support-footer">
       Bei Fragen oder vergessenem Passwort an <a href="mailto:brianm@dnmx.cc">brianm@dnmx.cc</a> schreiben.
+    </div>
+  </div>
+
+  <!-- POPUPS -->
+  <!-- POPUP: FÜR WAS ICH STEHE -->
+  <div class="popup-overlay" id="standPopup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup('standPopup')">×</span>
+      <h3>Für was ich stehe</h3>
+      <p style="font-size: 1.05rem; line-height: 1.6; color: var(--text-color); white-space: pre-wrap; word-break: break-word;">Eventuell fragen Sie sich, warum ich diese Website erstellt habe und was meine Motive sind. Natürlich werde ich darüber sprechen. Eigentlich wollte ich einen Ort schaffen, an dem jeder über alles reden kann. Ich bin mir bewusst, dass viele wissen, wer ich bin – das ist mir aber egal. Jeder sollte gleichbehandelt werden, und genau das möchte ich hier erreichen. Danke an alle, die hier teilnehmen.</p>
     </div>
   </div>
 
@@ -929,7 +945,6 @@
       }
     }
 
-    // Beim Starten gespeichertes Theme laden
     const savedTheme = localStorage.getItem("theme") || "light";
     document.documentElement.setAttribute("data-theme", savedTheme);
     updateThemeButton(savedTheme);
